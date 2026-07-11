@@ -1,166 +1,166 @@
 <!DOCTYPE html>
 <html lang="ja">
-    <style>
-    /* 全体のリセットと基本設定 */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
-    color: #4a3b32; /* 濃いブラウン */
-    background-color: #fcf9f5; /* 優しい生成り色 */
-    line-height: 1.6;
-}
-
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 40px 20px;
-}
-
-/* ヘッダー */
-header {
-    background-color: #ffffff;
-    border-bottom: 2px solid #f0e6df;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.header-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-}
-
-.logo {
-    font-size: 1.5rem;
-    color: #8b5a2b; /* 小麦色・レンガ色 */
-}
-
-nav ul {
-    display: flex;
-    list-style: none;
-}
-
-nav ul li {
-    margin-left: 20px;
-}
-
-nav ul li a {
-    text-decoration: none;
-    color: #705d53;
-    font-weight: bold;
-    font-size: 0.95rem;
-    transition: color 0.3s;
-}
-
-nav ul li a:hover, nav ul li a.active {
-    color: #d27d2d; /* アクセントのオレンジブラウン */
-}
-
-/* メインビジュアル */
-.hero {
-    background-color: #e6ccb2; /* パンの焼き色イメージ */
-    background-size: cover;
-    background-position: center;
-    height: 300px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 20px;
-}
-
-.hero-content h2 {
-    font-size: 2rem;
-    color: #4a3b32;
-    margin-bottom: 10px;
-}
-
-/* セクション共通 */
-section {
-    margin-bottom: 50px;
-}
-
-h2 {
-    font-size: 1.6rem;
-    color: #8b5a2b;
-    border-bottom: 2px solid #8b5a2b;
-    padding-bottom: 8px;
-    margin-bottom: 20px;
-}
-
-/* お知らせ */
-.news-list {
-    list-style: none;
-}
-
-.news-list li {
-    padding: 12px 0;
-    border-bottom: 1px dashed #e0d0c5;
-}
-
-.news-list .date {
-    font-weight: bold;
-    color: #a67c52;
-    margin-right: 15px;
-}
-
-/* マルシェカード */
-.marche-card {
-    background-color: #ffffff;
-    border: 1px solid #eaddd5;
-    border-radius: 8px;
-    padding: 25px;
-    margin-top: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-    position: relative;
-}
-
-.marche-badge {
-    position: absolute;
-    top: -12px;
-    left: 20px;
-    background-color: #d27d2d;
-    color: white;
-    padding: 3px 10px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    border-radius: 20px;
-}
-
-.marche-card h3 {
-    margin-bottom: 15px;
-    color: #4a3b32;
-}
-
-.marche-meta {
-    margin-bottom: 8px;
-    font-size: 0.95rem;
-}
-
-/* フッター */
-footer {
-    background-color: #4a3b32;
-    color: #fcf9f5;
-    text-align: center;
-    padding: 20px;
-    font-size: 0.85rem;
-    margin-top: 50px;
-}
-    </style>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>小さなパン工房ミール</title>
-    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        /* 全体のリセットと基本設定 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            color: #4a3b32; /* 濃いブラウン */
+            background-color: #fcf9f5; /* 優しい生成り色 */
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* ヘッダー */
+        header {
+            background-color: #ffffff;
+            border-bottom: 2px solid #f0e6df;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            color: #8b5a2b; /* 小麦色・レンガ色 */
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #705d53;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover, nav ul li a.active {
+            color: #d27d2d; /* アクセントのオレンジブラウン */
+        }
+
+        /* メインビジュアル */
+        .hero {
+            background-color: #e6ccb2; /* パンの焼き色イメージ */
+            background-size: cover;
+            background-position: center;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .hero-content h2 {
+            font-size: 2rem;
+            color: #4a3b32;
+            margin-bottom: 10px;
+        }
+
+        /* セクション共通 */
+        section {
+            margin-bottom: 50px;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            color: #8b5a2b;
+            border-bottom: 2px solid #8b5a2b;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+
+        /* お知らせ */
+        .news-list {
+            list-style: none;
+        }
+
+        .news-list li {
+            padding: 12px 0;
+            border-bottom: 1px dashed #e0d0c5;
+        }
+
+        .news-list .date {
+            font-weight: bold;
+            color: #a67c52;
+            margin-right: 15px;
+        }
+
+        /* マルシェカード */
+        .marche-card {
+            background-color: #ffffff;
+            border: 1px solid #eaddd5;
+            border-radius: 8px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            position: relative;
+        }
+
+        .marche-badge {
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background-color: #d27d2d;
+            color: white;
+            padding: 3px 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            border-radius: 20px;
+        }
+
+        .marche-card h3 {
+            margin-bottom: 15px;
+            color: #4a3b32;
+        }
+
+        .marche-meta {
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        /* フッター */
+        footer {
+            background-color: #4a3b32;
+            color: #fcf9f5;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.85rem;
+            margin-top: 50px;
+        }
+    </style>
 </head>
 <body>
 
