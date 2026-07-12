@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>メニュー・注文 | 小さなパン工房ミール</title>
+    <title>メニュー | 小さなパン工房ミール</title>
     <style>
         /* 全体のリセットと基本設定 */
         * {
@@ -20,7 +20,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 40px 20px;
         }
@@ -38,9 +38,9 @@
             max-width: 1000px;
             margin: 0 auto;
             display: flex;
-            flex-direction: column; /* 💡 スマホでは縦並びにする */
+            flex-direction: column;
             align-items: center;
-            gap: 10px; /* ロゴとナビの間に少し隙間を作る */
+            gap: 10px;
             padding: 15px 10px;
         }
 
@@ -58,31 +58,30 @@
         }
 
         nav ul li {
-            margin: 0 10px; /* 💡 左右の余白を少し狭めてスマホに収める */
+            margin: 0 8px;
         }
 
         nav ul li a {
             text-decoration: none;
             color: #705d53;
             font-weight: bold;
-            font-size: 0.9rem; /* 💡 文字サイズを少しだけ小さく */
+            font-size: 0.85rem;
             transition: color 0.3s;
-            white-space: nowrap; /* 💡 文字が途中で改行されるのを防ぐ */
+            white-space: nowrap;
         }
 
         nav ul li a:hover, nav ul li a.active {
             color: #d27d2d;
         }
 
-        /* 💻 画面が広いパソコンで見るとき用の設定 */
         @media (min-width: 600px) {
             .header-container {
-                flex-direction: row; /* パソコンでは横並びに戻す */
+                flex-direction: row;
                 justify-content: space-between;
                 padding: 15px 20px;
             }
             nav ul li {
-                margin-left: 20px;
+                margin-left: 15px;
                 margin-right: 0;
             }
             .logo {
@@ -93,158 +92,141 @@
             }
         }
 
-        /* セクション設定 */
+        /* セクション見出し */
         h2 {
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             color: #8b5a2b;
-            border-bottom: 2px solid #8b5a2b;
-            padding-bottom: 8px;
-            margin-bottom: 20px;
-        }
-
-        /* 販売タイプ選択 */
-        .order-type-select {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .type-btn {
-            flex: 1;
-            padding: 15px;
             text-align: center;
-            background-color: #ffffff;
-            border: 2px solid #eaddd5;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            color: #705d53;
-            font-size: 1.1rem;
+            margin-bottom: 10px;
         }
 
-        .type-btn.active {
-            border-color: #d27d2d;
-            background-color: #fff9f5;
-            color: #d27d2d;
+        .section-desc {
+            text-align: center;
+            color: #705d53;
+            margin-bottom: 40px;
+            font-size: 0.95rem;
+        }
+
+        .category-title {
+            font-size: 1.4rem;
+            color: #8b5a2b;
+            border-bottom: 2px solid #eaddd5;
+            padding-bottom: 5px;
+            margin-top: 40px;
+            margin-bottom: 20px;
         }
 
         /* パンのメニューリスト */
         .menu-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 20px;
         }
 
         .menu-card {
             background-color: #ffffff;
             border: 1px solid #eaddd5;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-3px);
         }
 
         .menu-image-placeholder {
             width: 100%;
-            height: 160px;
+            height: 180px;
             background-color: #f0e6df;
-            border-radius: 6px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #a67c52;
-            margin-bottom: 12px;
-            font-size: 0.9rem;
+            margin-bottom: 15px;
+            font-size: 2rem;
         }
 
         .menu-card h3 {
             font-size: 1.2rem;
             margin-bottom: 5px;
+            color: #4a3b32;
         }
 
         .menu-price {
             font-weight: bold;
             color: #d27d2d;
-            margin-bottom: 10px;
-        }
-
-        .menu-desc {
-            font-size: 0.9rem;
-            color: #705d53;
+            font-size: 1.1rem;
             margin-bottom: 15px;
         }
 
-        .quantity-select {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .quantity-select select {
-            padding: 5px 10px;
-            border-radius: 4px;
-            border: 1px solid #c2b2a6;
-        }
-
-        /* 注文オプション（日時・配送先など） */
-        .order-form-section {
-            background-color: #ffffff;
-            border: 1px solid #eaddd5;
-            border-radius: 8px;
-            padding: 25px;
-            margin-bottom: 40px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
+        /* 💡 個別詳細ページへの案内ボタン */
+        .detail-btn {
             display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-
-        .form-group input, .form-group select, .form-group textarea {
             width: 100%;
             padding: 10px;
-            border: 1px solid #c2b2a6;
-            border-radius: 4px;
-            font-size: 1rem;
+            text-align: center;
+            background-color: #fff9f5;
+            border: 1px solid #d27d2d;
+            color: #d27d2d;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.3s;
         }
 
-        /* 注文ボタン */
-        .submit-btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
+        .detail-btn:hover {
+            background-color: #d27d2d;
+            color: white;
+        }
+
+        /* 下部注文への導線バナー */
+        .order-guide-box {
+            background-color: #fff9f5;
+            border: 2px dashed #d27d2d;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .order-guide-box h3 {
+            color: #8b5a2b;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        .order-guide-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 35px;
             background-color: #8b5a2b;
             color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.2rem;
+            text-decoration: none;
             font-weight: bold;
-            cursor: pointer;
+            border-radius: 6px;
+            font-size: 1.1rem;
             transition: background-color 0.3s;
         }
 
-        .submit-btn:hover {
+        .order-guide-btn:hover {
             background-color: #705d53;
         }
 
-        /* 非表示用クラス */
-        .hidden {
-            display: none;
-        }
-
-        /* フッター */
         footer {
             background-color: #4a3b32;
             color: #fcf9f5;
             text-align: center;
             padding: 20px;
             font-size: 0.85rem;
-            margin-top: 50px;
+            margin-top: 60px;
         }
     </style>
 </head>
@@ -256,7 +238,8 @@
             <nav>
                 <ul>
                     <li><a href="index.html">ホーム</a></li>
-                    <li><a href="menu.html" class="active">メニュー・注文</a></li>
+                    <li><a href="menu.html" class="active">メニュー</a></li>
+                    <li><a href="order.html">注文</a></li>
                     <li><a href="mypage.html">マイページ</a></li>
                 </ul>
             </nav>
@@ -264,355 +247,237 @@
     </header>
 
     <main class="container">
-        <h2>ご注文フォーム</h2>
+        <h2>メニュー一覧</h2>
+        <p class="section-desc">気になるパンをクリックすると、原材料やアレルゲンの詳細をご確認いただけます。</p>
 
-        <div class="order-type-select">
-            <div class="type-btn active" id="btn-kobo" onclick="switchType('kobo')">工房受取の予約</div>
-            <div class="type-btn" id="btn-reito" onclick="switchType('reito')">冷凍発送の予約</div>
-        </div>
-
-        <section>
-            <h3>メニューを選ぶ</h3>
-            <p style="margin-bottom: 15px; font-size: 0.9rem; color: #705d53;">※季節や日によってメニューが変わる場合があります。</p>
-            
-            <div class="menu-grid">
-                <div class="menu-card">
+        <div class="category-title">ドーナツ</div>
+        <div class="menu-grid">
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🍩</div>
                     <h3>ドーナツ（プレーン）</h3>
                     <p class="menu-price">¥270</p>
-                    <p class="menu-desc">小さなパン工房ミール看板メニューのもちもちドーナツです。</p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="donuts.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🍩</div>
                     <h3>ココアドーナツ</h3>
                     <p class="menu-price">¥310</p>
-                    <p class="menu-desc">ココア風味でクランベリー入りのドーナツ。</p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="cocoa-donuts.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🍩</div>
                     <h3>あんドーナツ</h3>
                     <p class="menu-price">¥290</p>
-                    <p class="menu-desc">優しい甘さのあんこが詰まったドーナツ。</p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="an-donuts.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+        </div>
+
+        <div class="category-title">ベーグル</div>
+        <div class="menu-grid">
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🥯</div>
                     <h3>ベーグル（プレーン）</h3>
                     <p class="menu-price">¥250</p>
-                    <p class="menu-desc"></p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="bagel-plain.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🥯</div>
                     <h3>ベーグル（チョコチップ）</h3>
                     <p class="menu-price">¥320</p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="bagel-chocolate.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🥯</div>
                     <h3>ベーグル（チョコとくるみ）</h3>
                     <p class="menu-price">¥320</p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="bagel-chococash.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🥯</div>
                     <h3>ベーグル（ダブルチーズ）</h3>
                     <p class="menu-price">¥320</p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="bagel-cheese.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🥯</div>
                     <h3>ベーグル（黒ごま塩）</h3>
                     <p class="menu-price">¥300</p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="bagel-sesame-salt.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🥯</div>
                     <h3>ベーグル（黒ごまチーズ）</h3>
                     <p class="menu-price">¥320</p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="bagel-sesame-cheese.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🥯</div>
                     <h3>ベーグル（オニオンチーズベーコン）</h3>
                     <p class="menu-price">¥350</p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="bagel-onion-bacon.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🥯</div>
                     <h3>ベーグル（ウインナー）</h3>
                     <p class="menu-price">¥350</p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="bagel-wiener.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🥯</div>
                     <h3>ベーグル（クランベリーとクリームチーズ）</h3>
                     <p class="menu-price">¥340</p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="bagel-cranberry.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🥯</div>
                     <h3>ベーグル（高菜そぼろチーズ）</h3>
                     <p class="menu-price">¥350</p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="bagel-takana.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🥯</div>
                     <h3>ベーグル（あんことクリームチーズ）</h3>
                     <p class="menu-price">¥340</p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="bagel-anko-cheese.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🥯</div>
                     <h3>ベーグル（いちじくキャラメルナッツ）</h3>
                     <p class="menu-price">¥340</p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="bagel-fig.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+        </div>
+
+        <div class="category-title">食パン</div>
+        <div class="menu-grid">
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🍞</div>
                     <h3>ホテルブレッド</h3>
                     <p class="menu-price">¥480</p>
-                    <p class="menu-desc"></p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="hotel-bread.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🍞</div>
                     <h3>くるみとレーズンの黒糖食パン</h3>
                     <p class="menu-price">¥510</p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="kokuto-bread.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+        </div>
+
+        <div class="category-title">米粉スイーツ</div>
+        <div class="menu-grid">
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🍰</div>
                     <h3>米粉のシフォン（プレーン）</h3>
                     <p class="menu-price">¥250</p>
-                    <p class="menu-desc"></p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="chiffon-plain.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🍰</div>
                     <h3>米粉のシフォン（チョコチップ）</h3>
                     <p class="menu-price">¥270</p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="chiffon-chocolate.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🍰</div>
                     <h3>米粉のシフォン（ミルクティー）</h3>
                     <p class="menu-price">¥270</p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="chiffon-milktea.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🍰</div>
                     <h3>米粉のシフォン（コーヒーチョコ）</h3>
                     <p class="menu-price">¥270</p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="chiffon-coffee.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🧀</div>
                     <h3>米粉のベイクドチーズケーキ</h3>
                     <p class="menu-price">¥400</p>
-                    <p class="menu-desc"></p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card">
+                <a href="cheesecake.html" class="detail-btn">原材料・アレルゲンを見る</a>
+            </div>
+
+            <div class="menu-card">
+                <div>
                     <div class="menu-image-placeholder">🍋</div>
                     <h3>米粉のレモンパウンドケーキ</h3>
                     <p class="menu-price">¥280</p>
-                    <p class="menu-desc"></p>
-                    <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-                <div class="menu-card" style="opacity: 0.7;">
-                    <div class="menu-image-placeholder">🍪</div>
-                    <h3>米粉のココアクッキー</h3>
-                    <p class="menu-price">価格未定</p>
-                    <div class="quantity-select"><span style="color: #999;">-</span></div>
-                </div>
-                <div class="menu-card" style="opacity: 0.7;">
-                    <div class="menu-image-placeholder">🍪</div>
-                    <h3>米粉のスノーボールクッキー</h3>
-                    <p class="menu-price">価格未定</p>
-                    <div class="quantity-select"><span style="color: #999;">-</span></div>
-                </div>
-                <div class="menu-card" style="opacity: 0.7;">
-                    <div class="menu-image-placeholder">🎁</div>
-                    <h3>米粉のクッキーセット</h3>
-                    <p class="menu-price">価格未定</p>
-                    <div class="quantity-select"><span style="color: #999;">-</span></div>
-                </div>
+                <a href="lemon-cake.html" class="detail-btn">原材料・アレルゲンを見る</a>
             </div>
-        </section>
+        </div>
 
-        <section class="order-form-section">
-            <h3>お客様情報の入力</h3>
-            <br>
-            
-            <div id="form-kobo">
-                <div class="form-group">
-                    <label for="pickup-date">受取希望日</label>
-                    <input type="date" id="pickup-date">
-                </div>
-                <div class="form-group">
-                    <label for="pickup-time">受取希望時間</label>
-                    <select id="pickup-time">
-                        <option value="11:00">11:00 〜 12:00</option>
-                        <option value="13:00">13:00 〜 14:00</option>
-                        <option value="15:00">15:00 〜 16:00</option>
-                    </select>
-                </div>
-            </div>
-
-            <div id="form-reito" class="hidden">
-                <div class="form-group">
-                    <label for="shipping-range">発送予定時期</label>
-                    <select id="shipping-range">
-                        <option value="next-week">来週中に発送 (順次)</option>
-                        <option value="end-month">今月末に発送 (順次)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="address">お届け先住所</label>
-                    <input type="text" id="address" placeholder="〇〇県〇〇市... 〇〇マンション101">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="notes">お店へのメッセージ（任意）</label>
-                <textarea id="notes" rows="3" placeholder="アレルギーの相談や、ご要望があればご記入ください。"></textarea>
-            </div>
-
-            <button type="button" class="submit-btn" onclick="submitOrder()">予約を確定する（現地払い）</button>
-        </section>
+        <div class="order-guide-box">
+            <h3>食べたいパンが決まったら</h3>
+            <p>工房での受け取り予約、または冷凍発送のご注文はこちらからどうぞ！</p>
+            <a href="order.html" class="order-guide-btn">ご注文手続きへ進む</a>
+        </div>
     </main>
 
     <footer>
         <p>&copy; 2026 小さなパン工房ミール. All Rights Reserved.</p>
     </footer>
-
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
-    <script>
-        // Firebaseの初期化
-        const firebaseConfig = {
-            apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
-            authDomain: "mir-and-cosu.firebaseapp.com",
-            projectId: "mir-and-cosu",
-            storageBucket: "mir-and-cosu.firebasestorage.app",
-            messagingSenderId: "597556523101",
-            appId: "1:597556523101:web:338d402cd97dbf23c15db4",
-            measurementId: "G-294PKSL137"
-        };
-
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        // 販売タイプ切り替え関数
-        window.switchType = function(type) {
-            const btnKobo = document.getElementById('btn-kobo');
-            const btnReito = document.getElementById('btn-reito');
-            const formKobo = document.getElementById('form-kobo');
-            const formReito = document.getElementById('form-reito');
-
-            if (type === 'kobo') {
-                btnKobo.classList.add('active');
-                btnReito.classList.remove('active');
-                formKobo.classList.remove('hidden');
-                formReito.classList.add('hidden');
-                window.currentOrderType = 'kobo';
-            } else {
-                btnKobo.classList.remove('active');
-                btnReito.classList.add('active');
-                formKobo.classList.add('hidden');
-                formReito.classList.remove('hidden');
-                window.currentOrderType = 'reito';
-            }
-        }
-        
-        window.currentOrderType = 'kobo';
-
-        // 注文確定の処理
-        window.submitOrder = async function() {
-            alert("1. 注文処理を開始しました");
-
-            try {
-                const user = auth.currentUser;
-                alert("2. ログイン判定: " + (user ? "ログイン中(" + user.email + ")" : "未ログイン"));
-                
-                if (!user) {
-                    alert("注文するにはマイページからログインしてください。");
-                    return;
-                }
-
-                // 商品の集計
-                const items = {};
-                let totalPrice = 0;
-                const menuCards = document.querySelectorAll('.menu-card');
-                
-                menuCards.forEach(card => {
-                    const name = card.querySelector('h3').innerText;
-                    const priceText = card.querySelector('.menu-price').innerText;
-                    const select = card.querySelector('.quantity-select select');
-                    
-                    if (select) {
-                        const quantity = parseInt(select.value);
-                        if (quantity > 0) {
-                            const price = parseInt(priceText.replace('¥', ''));
-                            items[name] = quantity;
-                            totalPrice += price * quantity;
-                        }
-                    }
-                });
-
-                alert("3. 集計完了 金額: ¥" + totalPrice);
-
-                if (totalPrice === 0) {
-                    alert("商品が選択されていません。数量を選んでください。");
-                    return;
-                }
-
-                const orderData = {
-                    userId: user.uid,
-                    email: user.email,
-                    orderType: window.currentOrderType,
-                    items: items,
-                    totalPrice: totalPrice,
-                    status: "ordered",
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-
-                if (window.currentOrderType === 'kobo') {
-                    const date = document.getElementById('pickup-date').value;
-                    const time = document.getElementById('pickup-time').value;
-                    if (!date) { alert("受取希望日を入力してください。"); return; }
-                    orderData.pickupDate = date;
-                    orderData.pickupTime = time;
-                } else {
-                    const range = document.getElementById('shipping-range').value;
-                    const address = document.getElementById('address').value;
-                    if (!address) { alert("お届け先住所を入力してください。"); return; }
-                    orderData.shippingRange = range;
-                    orderData.address = address;
-                }
-
-                alert("4. データ作成完了。Firestoreへ送信します...");
-
-                // データの追加実行
-                const docRef = await db.collection("orders").add(orderData);
-                
-                alert("5. 送信成功！ 注文番号: " + docRef.id);
-                window.location.href = '/mypage';
-
-            } catch (error) {
-                // 💡 iPadの画面にエラーの正体を直接表示させます
-                alert("❌ エラーが発生しました:\nコード: " + error.code + "\nメッセージ: " + error.message);
-                console.error(error);
-            }
-        }
-    </script>
 </body>
 </html>
