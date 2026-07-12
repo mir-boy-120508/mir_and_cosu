@@ -26,73 +26,74 @@
             padding: 40px 20px;
         }
 
-/* ヘッダー */
-header {
-    background-color: #ffffff;
-    border-bottom: 2px solid #f0e6df;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
+        /* ヘッダー */
+        header {
+            background-color: #ffffff;
+            border-bottom: 2px solid #f0e6df;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-.header-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column; /* 💡 スマホでは縦並びにする */
-    align-items: center;
-    gap: 10px; /* ロゴとナビの間に少し隙間を作る */
-    padding: 15px 10px;
-}
+        .header-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column; /* 💡 スマホでは縦並びにする */
+            align-items: center;
+            gap: 10px; /* ロゴとナビの間に少し隙間を作る */
+            padding: 15px 10px;
+        }
 
-.logo {
-    font-size: 1.4rem;
-    color: #8b5a2b;
-    text-align: center;
-    font-weight: bold;
-}
+        .logo {
+            font-size: 1.4rem;
+            color: #8b5a2b;
+            text-align: center;
+            font-weight: bold;
+        }
 
-nav ul {
-    display: flex;
-    list-style: none;
-    justify-content: center;
-}
+        nav ul {
+            display: flex;
+            list-style: none;
+            justify-content: center;
+        }
 
-nav ul li {
-    margin: 0 10px; /* 💡 左右の余白を少し狭めてスマホに収める */
-}
+        nav ul li {
+            margin: 0 10px; /* 💡 左右の余白を少し狭めてスマホに収める */
+        }
 
-nav ul li a {
-    text-decoration: none;
-    color: #705d53;
-    font-weight: bold;
-    font-size: 0.9rem; /* 💡 文字サイズを少しだけ小さく */
-    transition: color 0.3s;
-    white-space: nowrap; /* 💡 文字が途中で改行されるのを防ぐ */
-}
+        nav ul li a {
+            text-decoration: none;
+            color: #705d53;
+            font-weight: bold;
+            font-size: 0.9rem; /* 💡 文字サイズを少しだけ小さく */
+            transition: color 0.3s;
+            white-space: nowrap; /* 💡 文字が途中で改行されるのを防ぐ */
+        }
 
-nav ul li a:hover, nav ul li a.active {
-    color: #d27d2d;
-}
+        nav ul li a:hover, nav ul li a.active {
+            color: #d27d2d;
+        }
 
-/* 💻 画面が広いパソコンで見るとき用の設定 */
-@media (min-width: 600px) {
-    .header-container {
-        flex-direction: row; /* パソコンでは横並びに戻す */
-        justify-content: space-between;
-        padding: 15px 20px;
-    }
-    nav ul li {
-        margin-left: 20px;
-        margin-right: 0;
-    }
-    .logo {
-        font-size: 1.5rem;
-    }
-    nav ul li a {
-        font-size: 0.95rem;
-    }
-}
+        /* 💻 画面が広いパソコンで見るとき用の設定 */
+        @media (min-width: 600px) {
+            .header-container {
+                flex-direction: row; /* パソコンでは横並びに戻す */
+                justify-content: space-between;
+                padding: 15px 20px;
+            }
+            nav ul li {
+                margin-left: 20px;
+                margin-right: 0;
+            }
+            .logo {
+                font-size: 1.5rem;
+            }
+            nav ul li a {
+                font-size: 0.95rem;
+            }
+        }
+
         /* メインビジュアル */
         .hero {
             background-color: #e6ccb2; /* パンの焼き色イメージ */
@@ -174,6 +175,14 @@ nav ul li a:hover, nav ul li a.active {
             font-size: 0.95rem;
         }
 
+        .marche-desc {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #eaddd5;
+        }
+
         /* フッター */
         footer {
             background-color: #4a3b32;
@@ -223,9 +232,10 @@ nav ul li a:hover, nav ul li a.active {
             
             <div class="marche-card">
                 <div class="marche-badge">次回出店</div>
-                <h3>どこでしょうね</h3>
-                <p class="marche-meta">📅 <strong>日時：</strong> 2026年x月x日(日) 10:00 〜 15:00</p>
-                <p class="marche-meta">📍 <strong>場所：</strong> どこかの公園 大広場</p>
+                <h3 id="marche-name">読み込み中...</h3>
+                <p class="marche-meta">📅 <strong>日時：</strong> <span id="marche-datetime">-</span></p>
+                <p class="marche-meta">📍 <strong>場所：</strong> <span id="marche-location">-</span></p>
+                <p id="marche-description" class="marche-desc" style="display: none;"></p>
             </div>
         </section>
 
@@ -235,5 +245,56 @@ nav ul li a:hover, nav ul li a.active {
         <p>&copy; 2026 小さなパン工房ミール. All Rights Reserved.</p>
     </footer>
 
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase初期化設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
+            authDomain: "mir-and-cosu.firebaseapp.com",
+            projectId: "mir-and-cosu",
+            storageBucket: "mir-and-cosu.firebasestorage.app",
+            messagingSenderId: "597556523101",
+            appId: "1:597556523101:web:338d402cd97dbf23c15db4",
+            measurementId: "G-294PKSL137"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        // ページ読み込み時にFirestoreから自動でマルシェ情報を取得する
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const doc = await db.collection("marche_info").doc("next_marche").get();
+                
+                const nameEl = document.getElementById("marche-name");
+                const datetimeEl = document.getElementById("marche-datetime");
+                const locationEl = document.getElementById("marche-location");
+                const descEl = document.getElementById("marche-description");
+
+                if (doc.exists) {
+                    const data = doc.data();
+                    nameEl.innerText = data.name || "出店予定は未定です";
+                    datetimeEl.innerText = data.datetime || "-";
+                    locationEl.innerText = data.location || "-";
+                    
+                    if (data.description) {
+                        descEl.innerText = data.description;
+                        descEl.style.display = "block"; // 詳細メッセージがある場合のみ表示
+                    } else {
+                        descEl.style.display = "none";
+                    }
+                } else {
+                    nameEl.innerText = "出店予定は未定です";
+                }
+            } catch (error) {
+                console.error("マルシェ情報の取得に失敗しました:", error);
+                document.getElementById("marche-name").innerText = "情報の読み込みに失敗しました";
+            }
+        });
+    </script>
 </body>
 </html>
