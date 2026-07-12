@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マイページ | 小さなパン工房ミール</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        /* 全体のリセットと基本設定 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            color: #4a3b32;
+            background-color: #fcf9f5;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* ヘッダー */
+        header {
+            background-color: #ffffff;
+            border-bottom: 2px solid #f0e6df;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            color: #8b5a2b;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #705d53;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        nav ul li a:hover, nav ul li a.active {
+            color: #d27d2d;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            color: #8b5a2b;
+            border-bottom: 2px solid #8b5a2b;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            color: #4a3b32;
+            margin-bottom: 10px;
+        }
+
+        /* 会員情報カード */
+        .user-profile {
+            background-color: #ffffff;
+            border: 1px solid #eaddd5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* 予約（QRコード）カード */
+        .order-card {
+            background-color: #ffffff;
+            border: 2px solid #d27d2d; /* 目立つようにオレンジブラウンの枠線 */
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(210,125,45,0.05);
+        }
+
+        .order-status-badge {
+            display: inline-block;
+            background-color: #d27d2d;
+            color: white;
+            padding: 3px 12px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .order-meta {
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        /* QRコードを表示するエリアのスタイル */
+        .qrcode-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff9f5;
+            border: 1px dashed #eaddd5;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        #qrcode {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: white;
+            border: 1px solid #eee;
+        }
+
+        .qrcode-hint {
+            font-size: 0.85rem;
+            color: #705d53;
+            font-weight: bold;
+        }
+
+        /* 過去の履歴リスト */
+        .history-list {
+            list-style: none;
+        }
+
+        .history-item {
+            background-color: #ffffff;
+            border: 1px solid #eaddd5;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-item-left p {
+            font-size: 0.9rem;
+            color: #705d53;
+        }
+
+        .history-item-right {
+            text-align: right;
+            font-weight: bold;
+            color: #8b5a2b;
+        }
+
+        /* フッター */
+        footer {
+            background-color: #4a3b32;
+            color: #fcf9f5;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.85rem;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <h1 class="logo">小さなパン工房ミール</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">ホーム</a></li>
+                    <li><a href="menu.html">メニュー・注文</a></li>
+                    <li><a href="mypage.html" class="active">マイページ</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <h2>マイページ</h2>
+
+        <section class="user-profile">
+            <h3>ミール 会員情報</h3>
+            <p><strong>お名前：</strong> みーる 太郎 様</p>
+            <p><strong>メールアドレス：</strong> kobo-meal-tarou@example.com</p>
+        </section>
+
+        <section>
+            <h2>現在の予約・受取用QRコード</h2>
+            
+            <div class="order-card">
+                <div class="order-status-badge">工房受取・未受取</div>
+                <h3>ご注文内容：ベーグルセット 他</h3>
+                <p class="order-meta">📅 <strong>受取予定日：</strong> 2026年x月x日 13:00 〜 14:00</p>
+                <p class="order-meta">🔢 <strong>注文番号：</strong> <span id="order-id">MEAL-20260712-001</span></p>
+                
+                <div class="qrcode-area">
+                    <div id="qrcode"></div>
+                    <p class="qrcode-hint">店頭でこのQRコードを店員にご提示ください</p>
+                </div>
+
+                <p style="font-size: 0.9rem;">🥖 ドーナツ（プレーン）× 1<br>🥯 ベーグル（高菜そぼろチーズ）× 2<br>💰 <strong>合計金額：¥970（現地でお支払い）</strong></p>
+            </div>
+        </section>
+
+        <section>
+            <h2>過去の購入履歴</h2>
+            <ul class="history-list">
+                <li class="history-item">
+                    <div class="history-item-left">
+                        <h3>冷凍発送分（おまかせパンセット）</h3>
+                        <p>2026年05月10日 発送完了</p>
+                    </div>
+                    <div class="history-item-right">
+                        <p>¥3,500</p>
+                    </div>
+                </li>
+                <li class="history-item">
+                    <div class="history-item-left">
+                        <h3>工房受取（米粉のシフォンケーキ 他）</h3>
+                        <p>2026年04月15日 受取済</p>
+                    </div>
+                    <div class="history-item-right">
+                        <p>¥1,250</p>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 小さなパン工房ミール. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // 本番はFirebaseからログインユーザーの最新の注文IDをここに入れます
+        const currentOrderId = "MEAL-20260712-001"; 
+        
+        // ライブラリを使って、指定したID（文字列）のQRコードを作ります
+        new QRCode(document.getElementById("qrcode"), {
+            text: currentOrderId,  // QRコードに埋め込む文字
+            width: 160,            // 横幅
+            height: 160,           // 縦幅
+            colorDark : "#4a3b32", // QRコード自体の色（お店のブラウンに合わせました）
+            colorLight : "#ffffff" // 背景色
+        });
+    </script>
+</body>
+</html>
