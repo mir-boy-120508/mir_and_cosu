@@ -213,8 +213,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
-    <script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script> <script>
         const firebaseConfig = {
             apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
             authDomain: "mir-and-cosu.firebaseapp.com",
@@ -229,6 +228,7 @@
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.firestore();
+        const auth = firebase.auth(); // 💡 Authのインスタンスを作成
 
         // URLから注文ID (?id=xxxxxx) を取得
         const urlParams = new URLSearchParams(window.location.search);
@@ -246,7 +246,6 @@
         // Firestoreから仮注文データを読み込む
         async function loadOrderData() {
             try {
-                // 💡 document(orderId) から doc(orderId) に修正
                 const doc = await db.collection("orders").doc(orderId).get();
                 if (!doc.exists) {
                     document.getElementById('loading-view').innerText = "❌ 指定された注文データが存在しないか、すでに削除されています。";
@@ -323,7 +322,6 @@
                 document.querySelector('.confirm-btn').style.backgroundColor = '#ccc';
                 
                 // 自動でステータスをキャンセルに更新
-                // 💡 document(orderId) から doc(orderId) に修正
                 db.collection("orders").doc(orderId).update({ status: "cancelled" });
                 return;
             }
@@ -337,7 +335,24 @@
         // 🎉 ボタン処理：最終確定
         async function finalizeOrder() {
             try {
-                // 💡 document(orderId) から doc(orderId) に修正
+                // 💡 【セキュリティガード】メール認証が本当に完了しているかを最新の状態でチェック
+                const user = auth.currentUser;
+                
+                if (!user) {
+                    alert("❌ ログイン情報が見つかりません。もう一度ログインしてください。");
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // 最新のユーザー情報をFirebaseサーバーから再取得して、認証完了したかをリフレッシュ
+                await user.reload();
+                
+                if (!auth.currentUser.emailVerified) {
+                    alert("⚠️ まだメール認証が完了していません。\n届いたメールのURLをクリックしてから、このボタンをもう一度押してください。");
+                    return;
+                }
+
+                // メール確認が取れていれば、注文ステータスを確定にする
                 await db.collection("orders").doc(orderId).update({
                     status: "ordered",
                     confirmedAt: firebase.firestore.FieldValue.serverTimestamp() // 確定時刻を記録
@@ -354,7 +369,6 @@
         async function cancelOrderManual() {
             if (!confirm("この注文の申し込みを取り消してもよろしいですか？")) return;
             try {
-                // 💡 document(orderId) から doc(orderId) に修正
                 await db.collection("orders").doc(orderId).update({
                     status: "cancelled"
                 });
