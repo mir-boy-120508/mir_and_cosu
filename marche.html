@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マルシェ出店情報 | 小さなパン工房ミール</title>
+    
+    <style>
+        /* 全体のリセットと基本設定 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            color: #4a3b32;
+            background-color: #fcf9f5;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* ヘッダー */
+        header {
+            background-color: #ffffff;
+            border-bottom: 2px solid #f0e6df;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 10px;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            color: #8b5a2b;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            justify-content: center;
+        }
+
+        nav ul li {
+            margin: 0 10px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #705d53;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+            white-space: nowrap;
+        }
+
+        nav ul li a:hover, nav ul li a.active {
+            color: #d27d2d;
+        }
+
+        @media (min-width: 600px) {
+            .header-container {
+                flex-direction: row;
+                justify-content: space-between;
+                padding: 15px 20px;
+            }
+            nav ul li {
+                margin-left: 20px;
+                margin-right: 0;
+            }
+            .logo {
+                font-size: 1.5rem;
+            }
+            nav ul li a {
+                font-size: 0.95rem;
+            }
+        }
+
+        /* ページタイトル */
+        h2 {
+            font-size: 1.6rem;
+            color: #8b5a2b;
+            border-bottom: 2px solid #8b5a2b;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .intro-text {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #705d53;
+        }
+
+        /* マルシェ大カード */
+        .marche-highlight {
+            background-color: #ffffff;
+            border: 2px solid #d27d2d;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 6px 16px rgba(210,125,45,0.05);
+            position: relative;
+        }
+
+        .highlight-badge {
+            position: absolute;
+            top: -15px;
+            left: 30px;
+            background-color: #d27d2d;
+            color: white;
+            padding: 4px 15px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            border-radius: 20px;
+            letter-spacing: 1px;
+        }
+
+        .marche-title {
+            font-size: 1.5rem;
+            color: #8b5a2b;
+            margin-bottom: 20px;
+            margin-top: 5px;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .info-table tr {
+            border-bottom: 1px solid #f0e6df;
+        }
+
+        .info-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .info-table th, .info-table td {
+            padding: 12px 8px;
+            text-align: left;
+        }
+
+        .info-table th {
+            width: 100px;
+            color: #a67c52;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .info-table td {
+            font-size: 1.05rem;
+        }
+
+        .marche-message {
+            background-color: #fff9f5;
+            border-left: 4px solid #d27d2d;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.95rem;
+            color: #55443a;
+        }
+
+        /* ご案内セクション */
+        .notice-box {
+            background-color: #f5efe6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .notice-box h3 {
+            font-size: 1.1rem;
+            color: #8b5a2b;
+            margin-bottom: 10px;
+        }
+
+        .notice-box ul {
+            padding-left: 20px;
+            font-size: 0.9rem;
+            color: #66554a;
+        }
+
+        .notice-box li {
+            margin-bottom: 5px;
+        }
+
+        /* フッター */
+        footer {
+            background-color: #4a3b32;
+            color: #fcf9f5;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.85rem;
+            margin-top: 60px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <h1 class="logo">小さなパン工房ミール</h1>
+            <nav>
+                <ul>
+                    <li><a href="/">ホーム</a></li>
+                    <li><a href="/menu">メニュー</a></li>
+                    <li><a href="/order">注文</a></li>
+                    <li><a href="/marche" class="active">マルシェ</a></li>
+                    <li><a href="/mypage">マイページ</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <h2>マルシェ出店情報</h2>
+        <p class="intro-text">小さなパン工房ミールがお邪魔する、直近のマルシェスケジュールです！</p>
+        
+        <div class="marche-highlight">
+            <div class="highlight-badge">NEXT MARCHE</div>
+            <h3 class="marche-title" id="marche-name">読み込み中...</h3>
+            
+            <table class="info-table">
+                <tr>
+                    <th>📅 日時</th>
+                    <td id="marche-datetime">-</td>
+                </tr>
+                <tr>
+                    <th>📍 場所</th>
+                    <td id="marche-location">-</td>
+                </tr>
+            </table>
+
+            <div id="marche-desc-box" class="marche-message" style="display: none;">
+                <p id="marche-description"></p>
+            </div>
+        </div>
+
+        <div class="notice-box">
+            <h3>🎪 マルシェにお越しのお客さまへ</h3>
+            <ul>
+                <li>商品はすべて数量限定のため、売り切れ次第終了となる場合がございます。</li>
+                <li>エコバッグ（マイバッグ）の持参にご協力をお願いいたします。</li>
+                <li>悪天候などによるマルシェの開催可否については、主催者様の発表に準じます。</li>
+            </ul>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 小さなパン工房ミール. All Rights Reserved.</p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase初期化設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
+            authDomain: "mir-and-cosu.firebaseapp.com",
+            projectId: "mir-and-cosu",
+            storageBucket: "mir-and-cosu.firebasestorage.app",
+            messagingSenderId: "597556523101",
+            appId: "1:597556523101:web:338d402cd97dbf23c15db4",
+            measurementId: "G-294PKSL137"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        // ページ読み込み時にFirestoreから自動で最新のマルシェ情報を取得
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const doc = await db.collection("marche_info").doc("next_marche").get();
+                
+                const nameEl = document.getElementById("marche-name");
+                const datetimeEl = document.getElementById("marche-datetime");
+                const locationEl = document.getElementById("marche-location");
+                const descBox = document.getElementById("marche-desc-box");
+                const descEl = document.getElementById("marche-description");
+
+                if (doc.exists) {
+                    const data = doc.data();
+                    nameEl.innerText = data.name || "出店予定は未定です";
+                    datetimeEl.innerText = data.datetime || "-";
+                    locationEl.innerText = data.location || "-";
+                    
+                    if (data.description) {
+                        descEl.innerText = data.description;
+                        descBox.style.display = "block"; // メッセージがある時だけ表示
+                    } else {
+                        descBox.style.display = "none";
+                    }
+                } else {
+                    nameEl.innerText = "出店予定は未定です";
+                }
+            } catch (error) {
+                console.error("マルシェ情報の取得に失敗しました:", error);
+                document.getElementById("marche-name").innerText = "情報の読み込みに失敗しました";
+            }
+        });
+    </script>
+</body>
+</html>
