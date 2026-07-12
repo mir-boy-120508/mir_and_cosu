@@ -25,73 +25,74 @@
             padding: 40px 20px;
         }
 
-/* ヘッダー */
-header {
-    background-color: #ffffff;
-    border-bottom: 2px solid #f0e6df;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
+        /* ヘッダー */
+        header {
+            background-color: #ffffff;
+            border-bottom: 2px solid #f0e6df;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-.header-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column; /* 💡 スマホでは縦並びにする */
-    align-items: center;
-    gap: 10px; /* ロゴとナビの間に少し隙間を作る */
-    padding: 15px 10px;
-}
+        .header-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column; /* 💡 スマホでは縦並びにする */
+            align-items: center;
+            gap: 10px; /* ロゴとナビの間に少し隙間を作る */
+            padding: 15px 10px;
+        }
 
-.logo {
-    font-size: 1.4rem;
-    color: #8b5a2b;
-    text-align: center;
-    font-weight: bold;
-}
+        .logo {
+            font-size: 1.4rem;
+            color: #8b5a2b;
+            text-align: center;
+            font-weight: bold;
+        }
 
-nav ul {
-    display: flex;
-    list-style: none;
-    justify-content: center;
-}
+        nav ul {
+            display: flex;
+            list-style: none;
+            justify-content: center;
+        }
 
-nav ul li {
-    margin: 0 10px; /* 💡 左右の余白を少し狭めてスマホに収める */
-}
+        nav ul li {
+            margin: 0 10px; /* 💡 左右の余白を少し狭めてスマホに収める */
+        }
 
-nav ul li a {
-    text-decoration: none;
-    color: #705d53;
-    font-weight: bold;
-    font-size: 0.9rem; /* 💡 文字サイズを少しだけ小さく */
-    transition: color 0.3s;
-    white-space: nowrap; /* 💡 文字が途中で改行されるのを防ぐ */
-}
+        nav ul li a {
+            text-decoration: none;
+            color: #705d53;
+            font-weight: bold;
+            font-size: 0.9rem; /* 💡 文字サイズを少しだけ小さく */
+            transition: color 0.3s;
+            white-space: nowrap; /* 💡 文字が途中で改行されるのを防ぐ */
+        }
 
-nav ul li a:hover, nav ul li a.active {
-    color: #d27d2d;
-}
+        nav ul li a:hover, nav ul li a.active {
+            color: #d27d2d;
+        }
 
-/* 💻 画面が広いパソコンで見るとき用の設定 */
-@media (min-width: 600px) {
-    .header-container {
-        flex-direction: row; /* パソコンでは横並びに戻す */
-        justify-content: space-between;
-        padding: 15px 20px;
-    }
-    nav ul li {
-        margin-left: 20px;
-        margin-right: 0;
-    }
-    .logo {
-        font-size: 1.5rem;
-    }
-    nav ul li a {
-        font-size: 0.95rem;
-    }
-}
+        /* 💻 画面が広いパソコンで見るとき用の設定 */
+        @media (min-width: 600px) {
+            .header-container {
+                flex-direction: row; /* パソコンでは横並びに戻す */
+                justify-content: space-between;
+                padding: 15px 20px;
+            }
+            nav ul li {
+                margin-left: 20px;
+                margin-right: 0;
+            }
+            .logo {
+                font-size: 1.5rem;
+            }
+            nav ul li a {
+                font-size: 0.95rem;
+            }
+        }
+
         /* セクション設定 */
         h2 {
             font-size: 1.6rem;
@@ -274,7 +275,7 @@ nav ul li a:hover, nav ul li a.active {
             <h3>メニューを選ぶ</h3>
             <p style="margin-bottom: 15px; font-size: 0.9rem; color: #705d53;">※季節や日によってメニューが変わる場合があります。</p>
             
-<div class="menu-grid">
+            <div class="menu-grid">
                 <div class="menu-card">
                     <div class="menu-image-placeholder">🍩</div>
                     <h3>ドーナツ（プレーン）</h3>
@@ -296,7 +297,6 @@ nav ul li a:hover, nav ul li a.active {
                     <p class="menu-desc">優しい甘さのあんこが詰まったドーナツ。</p>
                     <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-
                 <div class="menu-card">
                     <div class="menu-image-placeholder">🥯</div>
                     <h3>ベーグル（プレーン）</h3>
@@ -370,7 +370,6 @@ nav ul li a:hover, nav ul li a.active {
                     <p class="menu-price">¥340</p>
                     <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-
                 <div class="menu-card">
                     <div class="menu-image-placeholder">🍞</div>
                     <h3>ホテルブレッド</h3>
@@ -384,7 +383,6 @@ nav ul li a:hover, nav ul li a.active {
                     <p class="menu-price">¥510</p>
                     <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-
                 <div class="menu-card">
                     <div class="menu-image-placeholder">🍰</div>
                     <h3>米粉のシフォン（プレーン）</h3>
@@ -410,7 +408,6 @@ nav ul li a:hover, nav ul li a.active {
                     <p class="menu-price">¥270</p>
                     <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-
                 <div class="menu-card">
                     <div class="menu-image-placeholder">🧀</div>
                     <h3>米粉のベイクドチーズケーキ</h3>
@@ -418,7 +415,6 @@ nav ul li a:hover, nav ul li a.active {
                     <p class="menu-desc"></p>
                     <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-
                 <div class="menu-card">
                     <div class="menu-image-placeholder">🍋</div>
                     <h3>米粉のレモンパウンドケーキ</h3>
@@ -426,24 +422,23 @@ nav ul li a:hover, nav ul li a.active {
                     <p class="menu-desc"></p>
                     <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-
                 <div class="menu-card" style="opacity: 0.7;">
                     <div class="menu-image-placeholder">🍪</div>
                     <h3>米粉のココアクッキー</h3>
                     <p class="menu-price">価格未定</p>
-                    <div class="quantity-select"><span style="color: #999;">@</span></div>
+                    <div class="quantity-select"><span style="color: #999;">-</span></div>
                 </div>
                 <div class="menu-card" style="opacity: 0.7;">
                     <div class="menu-image-placeholder">🍪</div>
                     <h3>米粉のスノーボールクッキー</h3>
                     <p class="menu-price">価格未定</p>
-                    <div class="quantity-select"><span style="color: #999;">@</span></div>
+                    <div class="quantity-select"><span style="color: #999;">-</span></div>
                 </div>
                 <div class="menu-card" style="opacity: 0.7;">
                     <div class="menu-image-placeholder">🎁</div>
                     <h3>米粉のクッキーセット</h3>
                     <p class="menu-price">価格未定</p>
-                    <div class="quantity-select"><span style="color: #999;">@</span></div>
+                    <div class="quantity-select"><span style="color: #999;">-</span></div>
                 </div>
             </div>
         </section>
@@ -494,32 +489,12 @@ nav ul li a:hover, nav ul li a.active {
         <p>&copy; 2026 小さなパン工房ミール. All Rights Reserved.</p>
     </footer>
 
-    <script>
-        function switchType(type) {
-            const btnKobo = document.getElementById('btn-kobo');
-            const btnReito = document.getElementById('btn-reito');
-            const formKobo = document.getElementById('form-kobo');
-            const formReito = document.getElementById('form-reito');
-
-            if (type === 'kobo') {
-                btnKobo.classList.add('active');
-                btnReito.classList.remove('active');
-                formKobo.classList.remove('hidden');
-                formReito.classList.add('hidden');
-            } else {
-                btnKobo.classList.remove('active');
-                btnReito.classList.add('active');
-                formKobo.classList.add('hidden');
-                formReito.classList.remove('hidden');
-            }
-        }
-
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // Firebaseの初期化（互換モードの書き方）
+        // Firebaseの初期化
         const firebaseConfig = {
             apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
             authDomain: "mir-and-cosu.firebaseapp.com",
@@ -530,12 +505,13 @@ nav ul li a:hover, nav ul li a.active {
             measurementId: "G-294PKSL137"
         };
 
-        // 初期化を実行
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // タブ切り替え関数
+        // 販売タイプ切り替え関数
         window.switchType = function(type) {
             const btnKobo = document.getElementById('btn-kobo');
             const btnReito = document.getElementById('btn-reito');
@@ -564,7 +540,6 @@ nav ul li a:hover, nav ul li a.active {
             alert("1. 注文処理を開始しました");
 
             try {
-                // ログインチェック
                 const user = auth.currentUser;
                 alert("2. ログイン判定: " + (user ? "ログイン中(" + user.email + ")" : "未ログイン"));
                 
@@ -607,7 +582,7 @@ nav ul li a:hover, nav ul li a.active {
                     items: items,
                     totalPrice: totalPrice,
                     status: "ordered",
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp() // 互換モードのタイムスタンプ
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
                 if (window.currentOrderType === 'kobo') {
@@ -626,7 +601,7 @@ nav ul li a:hover, nav ul li a.active {
 
                 alert("4. データ作成完了。Firestoreへ送信します...");
 
-                // データの追加実行（互換モードの書き方）
+                // データの追加実行
                 const docRef = await db.collection("orders").add(orderData);
                 
                 alert("5. 送信成功！ 注文番号: " + docRef.id);
