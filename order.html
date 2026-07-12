@@ -534,11 +534,10 @@
                     orderData.notes = notes;
                 }
 
-                // ① まずはFirebase Firestoreに保存
+                // ① Firebase Firestoreに保存
                 const docRef = await db.collection("orders").add(orderData);
                 
-                // ② 🔗 Cloudflare Workersにデータを送信してメールを飛ばす処理を追加！
-                // ⚠️ 下のURLをご自身のWorkersのURL（https://xxx.xxx.workers.dev）に差し替えてください！
+                // ② Cloudflare Workersにデータを送信してメールを飛ばす
                 const workersUrl = "https://mir-order-api.mir-boy-20120508.workers.dev/"; 
 
                 try {
@@ -564,10 +563,8 @@
                     console.error("Workersへの通信に失敗しました:", err);
                 }
 
-                alert("仮注文の申し込みが完了しました！\n登録されたメールアドレスに「注文確定用リンク」をお送りしました。\n1時間以内にメールを確認して、本確定を行ってください。");
-                
-                // 元の確認画面ジャンプ処理（本番時は確認完了後に誘導するため、一旦mypageやトップへ戻す運用も可能ですが、テスト用にそのまま残します）
-                window.location.href = `confirm.html?id=${docRef.id}`;
+                // ⭕ 修正：confirm.htmlではなく、新設する「メール案内用の専用ページ」へリダイレクト！
+                window.location.href = 'order-pending.html';
 
             } catch (error) {
                 alert("❌ エラーが発生しました:\n" + error.message);
