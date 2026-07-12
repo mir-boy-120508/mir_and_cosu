@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>店員用スキャナー | 小さなパン工房ミール</title>
-    
-    <script src="https://unpkg.com/html5-qrcode"></script>
-
+    <title>ご注文手続き | 小さなパン工房ミール</title>
     <style>
+        /* 全体のリセットと基本設定 */
         * {
             margin: 0;
             padding: 0;
@@ -15,140 +13,718 @@
         }
 
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
             color: #4a3b32;
-            background-color: #f5efe6; /* 店員用画面は少し見分けがつくように色を変えています */
-            padding: 20px;
+            background-color: #fcf9f5;
+            line-height: 1.6;
         }
 
-        .admin-container {
-            max-width: 500px;
+        .container {
+            max-width: 800px;
             margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 40px 20px;
         }
 
-        h1 {
+        /* ヘッダー */
+        header {
+            background-color: #ffffff;
+            border-bottom: 2px solid #f0e6df;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 10px;
+        }
+
+        .logo {
             font-size: 1.4rem;
-            text-align: center;
-            margin-bottom: 20px;
             color: #8b5a2b;
-            border-bottom: 2px dashed #8b5a2b;
-            padding-bottom: 10px;
-        }
-
-        /* カメラが映るエリア */
-        #reader {
-            width: 100% !important;
-            border: 2px solid #c2b2a6 !important;
-            border-radius: 8px;
-            overflow: hidden;
-            background-color: #000;
-        }
-
-        /* 読み取り結果を表示するエリア */
-        .result-section {
-            margin-top: 25px;
-            padding: 15px;
-            background-color: #fff9f5;
-            border: 2px solid #d27d2d;
-            border-radius: 8px;
-            display: none; /* 最初は非表示 */
-        }
-
-        .result-section.active {
-            display: block;
-        }
-
-        .order-title {
-            font-size: 1.2rem;
+            text-align: center;
             font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            justify-content: center;
+        }
+
+        nav ul li {
+            margin: 0 8px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #705d53;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: color 0.3s;
+            white-space: nowrap;
+        }
+
+        nav ul li a:hover, nav ul li a.active {
+            color: #d27d2d;
+        }
+
+        @media (min-width: 600px) {
+            .header-container {
+                flex-direction: row;
+                justify-content: space-between;
+                padding: 15px 20px;
+            }
+            nav ul li {
+                margin-left: 15px;
+                margin-right: 0;
+            }
+            .logo {
+                font-size: 1.5rem;
+            }
+            nav ul li a {
+                font-size: 0.95rem;
+            }
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            color: #8b5a2b;
+            border-bottom: 2px solid #8b5a2b;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+
+        /* 販売タイプ選択 */
+        .order-type-select {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .type-btn {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background-color: #ffffff;
+            border: 2px solid #eaddd5;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #705d53;
+            font-size: 1.1rem;
+        }
+
+        .type-btn.active {
+            border-color: #d27d2d;
+            background-color: #fff9f5;
+            color: #d27d2d;
+        }
+
+        /* 注文オプション（上部へ移動） */
+        .order-form-section {
+            background-color: #ffffff;
+            border: 1px solid #eaddd5;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #c2b2a6;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        /* 注文用簡易リスト */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .menu-card {
+            background-color: #ffffff;
+            border: 1px solid #eaddd5;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .menu-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .menu-price {
+            font-weight: bold;
+            color: #d27d2d;
             margin-bottom: 10px;
         }
 
-        .order-details {
-            font-size: 0.95rem;
-            margin-bottom: 15px;
-            line-height: 1.5;
+        .quantity-select {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px dashed #eaddd5;
+            padding-top: 10px;
         }
 
-        /* お渡し完了ボタン */
-        .complete-btn {
+        .quantity-select select {
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 1px solid #c2b2a6;
+            min-width: 80px;
+        }
+
+        .stock-notice {
+            font-size: 0.8rem;
+            color: #8b7365;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .submit-btn {
             display: block;
             width: 100%;
-            padding: 12px;
-            background-color: #d27d2d;
+            padding: 15px;
+            background-color: #8b5a2b;
             color: white;
             border: none;
-            border-radius: 6px;
-            font-size: 1.1rem;
+            border-radius: 8px;
+            font-size: 1.2rem;
             font-weight: bold;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
 
-        .complete-btn:hover {
-            background-color: #b66520;
+        .submit-btn:hover {
+            background-color: #705d53;
         }
 
-        .nav-link {
-            display: block;
+        .hidden {
+            display: none;
+        }
+
+        footer {
+            background-color: #4a3b32;
+            color: #fcf9f5;
             text-align: center;
-            margin-top: 20px;
-            color: #705d53;
-            text-decoration: none;
-            font-size: 0.9rem;
+            padding: 20px;
+            font-size: 0.85rem;
+            margin-top: 50px;
         }
     </style>
 </head>
 <body>
 
-    <div class="admin-container">
-        <h1>ミール・受取スキャナー</h1>
-        
-        <div id="reader"></div>
+    <header>
+        <div class="header-container">
+            <h1 class="logo">小さなパン工房ミール</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">ホーム</a></li>
+                    <li><a href="menu.html">メニュー</a></li>
+                    <li><a href="order.html" class="active">注文</a></li>
+                    <li><a href="mypage.html">マイページ</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-        <div id="scan-result" class="result-section">
-            <div class="order-title">注文照合成功！</div>
-            <p style="font-size: 0.85rem; color:#d27d2d; margin-bottom:10px;">ID: <span id="res-order-id"></span></p>
-            
-            <div class="order-details">
-                <p><strong>お客様：</strong> みーる 太郎 様</p>
-                <p><strong>受取時間：</strong> 13:00 〜 14:00 (本日)</p>
-                <hr style="margin: 10px 0; border: 0; border-top: 1px solid #eaddd5;">
-                <p>🥖 ドーナツ（プレーン）× 1</p>
-                <p>🥯 ベーグル（高菜そぼろチーズ）× 2</p>
-                <hr style="margin: 10px 0; border: 0; border-top: 1px solid #eaddd5;">
-                <p style="font-size: 1.1rem; color: #8b5a2b;"><strong>請求金額：¥970（現地払い）</strong></p>
-            </div>
+    <main class="container">
+        <h2>ご注文手続き</h2>
 
-            <button type="button" class="complete-btn" onclick="completePickup()">商品を渡して完了にする</button>
+        <div class="order-type-select">
+            <div class="type-btn active" id="btn-kobo" onclick="switchType('kobo')">工房受取の予約</div>
+            <div class="type-btn" id="btn-reito" onclick="switchType('reito')">冷凍発送の予約</div>
         </div>
 
-        <a href="/" class="nav-link">⬅ ホームへ戻る</a>
-    </div>
+        <section class="order-form-section">
+            <div id="form-kobo">
+                <div class="form-group">
+                    <label for="pickup-date">受取希望日</label>
+                    <select id="pickup-date" onchange="handleDateChange()">
+                        <option value="">販売日を読み込み中...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pickup-time">受取希望時間</label>
+                    <select id="pickup-time">
+                        <option value="11:00">11:00 〜 12:00</option>
+                        <option value="13:00">13:00 〜 14:00</option>
+                        <option value="15:00">15:00 〜 16:00</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="form-reito" class="hidden">
+                <div class="form-group">
+                    <label for="shipping-range">発送予定時期</label>
+                    <select id="shipping-range">
+                        <option value="next-week">来週中に発送 (順次)</option>
+                        <option value="end-month">今月末に発送 (順次)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="address">お届け先住所</label>
+                    <input type="text" id="address" placeholder="〇〇県〇〇市... 〇〇マンション101">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="notes">お店へのメッセージ（任意）</label>
+                <textarea id="notes" rows="3" placeholder="アレルギーの相談や、ご要望があればご記入ください。"></textarea>
+            </div>
+        </section>
+
+        <section>
+            <h3>数量を選択してください</h3>
+            <br>
+            <div class="menu-grid">
+                <div class="menu-card">
+                    <h3>ドーナツ（プレーン）</h3>
+                    <p class="menu-price">¥270</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="ドーナツ（プレーン）"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-ドーナツ（プレーン）"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>ココアドーナツ</h3>
+                    <p class="menu-price">¥310</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="ココアドーナツ"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-ココアドーナツ"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>あんドーナツ</h3>
+                    <p class="menu-price">¥290</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="あんドーナツ"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-あんドーナツ"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>ベーグル（プレーン）</h3>
+                    <p class="menu-price">¥250</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="ベーグル（プレーン）"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-ベーグル（プレーン）"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>ベーグル（チョコチップ）</h3>
+                    <p class="menu-price">¥320</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="ベーグル（チョコチップ）"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-ベーグル（チョコチップ）"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>ベーグル（チョコとくるみ）</h3>
+                    <p class="menu-price">¥320</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="ベーグル（チョコとくるみ）"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-ベーグル（チョコとくるみ）"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>ベーグル（ダブルチーズ）</h3>
+                    <p class="menu-price">¥320</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="ベーグル（ダブルチーズ）"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-ベーグル（ダブルチーズ）"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>ベーグル（黒ごま塩）</h3>
+                    <p class="menu-price">¥300</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="ベーグル（黒ごま塩）"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-ベーグル（黒ごま塩）"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>ベーグル（黒ごまチーズ）</h3>
+                    <p class="menu-price">¥320</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="ベーグル（黒ごまチーズ）"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-ベーグル（黒ごまチーズ）"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>ベーグル（オニオンチーズベーコン）</h3>
+                    <p class="menu-price">¥350</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="ベーグル（オニオンチーズベーコン）"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-ベーグル（オニオンチーズベーコン）"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>ベーグル（ウインナー Mum）</h3>
+                    <p class="menu-price">¥350</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="ベーグル（ウインナー Mum）"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-ベーグル（ウインナー Mum）"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>ベーグル（クランベリーとクリームチーズ）</h3>
+                    <p class="menu-price">¥340</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="ベーグル（クランベリーとクリームチーズ）"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-ベーグル（クランベリーとクリームチーズ）"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>ベーグル（高菜そぼろチーズ）</h3>
+                    <p class="menu-price">¥350</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="ベーグル（高菜そぼろチーズ）"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-ベーグル（高菜そぼろチーズ）"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>ベーグル（あんことクリームチーズ）</h3>
+                    <p class="menu-price">¥340</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="ベーグル（あんことクリームチーズ）"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-ベーグル（あんことクリームチーズ）"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>ベーグル（いちじくキャラメルナッツ）</h3>
+                    <p class="menu-price">¥340</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="ベーグル（いちじくキャラメルナッツ）"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-ベーグル（いちじくキャラメルナッツ）"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>ホテルブレッド</h3>
+                    <p class="menu-price">¥480</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="ホテルブレッド"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-ホテルブレッド"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>くるみとレーズンの黒糖食パン</h3>
+                    <p class="menu-price">¥510</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="くるみとレーズンの黒糖食パン"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-くるみとレーズンの黒糖食パン"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>米粉のシフォン（プレーン）</h3>
+                    <p class="menu-price">¥250</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="米粉のシフォン（プレーン）"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-米粉のシフォン（プレーン）"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>米粉のシフォン（チョコチップ）</h3>
+                    <p class="menu-price">¥270</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="米粉のシフォン（チョコチップ）"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-米粉のシフォン（チョコチップ）"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>米粉のシフォン（ミルクティー）</h3>
+                    <p class="menu-price">¥270</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="米粉のシフォン（ミルクティー）"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-米粉のシフォン（ミルクティー）"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>米粉のシフォン（コーヒーチョコ）</h3>
+                    <p class="menu-price">¥270</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="米粉のシフォン（コーヒーチョコ）"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-米粉のシフォン（コーヒーチョコ）"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>米粉のベイクドチーズケーキ</h3>
+                    <p class="menu-price">¥400</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="米粉のベイクドチーズケーキ"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-米粉のベイクドチーズケーキ"></div>
+                </div>
+                <div class="menu-card">
+                    <h3>米粉のレモンパウンドケーキ</h3>
+                    <p class="menu-price">¥280</p>
+                    <div class="quantity-select"><span>数量：</span><select data-name="米粉のレモンパウンドケーキ"><option value="0">0</option></select></div>
+                    <div class="stock-notice" id="stock-notice-米粉のレモンパウンドケーキ"></div>
+                </div>
+            </div>
+
+            <button type="button" class="submit-btn" onclick="submitOrder()">仮予約を申し込む（メール確認へ）</button>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 小さなパン工房ミール. All Rights Reserved.</p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
-// スキャナーの設定を細かく指定してエラーを回避する
-const config = {
-    fps: 15,
-    qrbox: 250,
-    // カメラの制約を緩くする（iOSやiPadでのOverconstrainedError対策）
-    videoConstraints: {
-        facingMode: "environment" // 背面カメラを優先（無理なら前面）
-    }
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
+            authDomain: "mir-and-cosu.firebaseapp.com",
+            projectId: "mir-and-cosu",
+            storageBucket: "mir-and-cosu.firebasestorage.app",
+            messagingSenderId: "597556523101",
+            appId: "1:597556523101:web:338d402cd97dbf23c15db4",
+            measurementId: "G-294PKSL137"
+        };
 
-// スキャナーの初期化と起動
-let html5QrcodeScanner = new Html5QrcodeScanner("reader", config, /* verbose= */ false);
-html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-// 「お渡し完了」ボタンを押したとき
-function completePickup() {
-    alert("お渡し完了ステータスに更新しました！（今後Firebaseと連動してデータを書き換えます）");
-    document.getElementById("scan-result").classList.remove("active");
-}
+        let salesDaysData = {};
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const pickupDateSelect = document.getElementById('pickup-date');
+            try {
+                const snapshot = await db.collection("sales_days")
+                                           .where("status", "==", "open")
+                                           .orderBy("date", "asc")
+                                           .get();
+                
+                pickupDateSelect.innerHTML = '';
+                salesDaysData = {};
+                
+                if (snapshot.empty) {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.innerText = '現在、ご予約可能な販売日はありません';
+                    pickupDateSelect.appendChild(option);
+                    updateQuantityDropdowns(0);
+                    return;
+                }
+                
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.innerText = '選択してください';
+                pickupDateSelect.appendChild(defaultOption);
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    salesDaysData[data.date] = data.stock || {};
+                    
+                    const option = document.createElement('option');
+                    option.value = data.date; 
+                    
+                    const dateObj = new Date(data.date);
+                    const formattedDate = `${dateObj.getFullYear()}年${String(dateObj.getMonth() + 1).padStart(2, '0')}月${String(dateObj.getDate()).padStart(2, '0')}日`;
+                    
+                    option.innerText = formattedDate;
+                    pickupDateSelect.appendChild(option);
+                });
+
+                updateQuantityDropdowns(0);
+
+            } catch (error) {
+                console.error("販売日の取得に失敗しました:", error);
+                pickupDateSelect.innerHTML = '<option value="">販売日の読み込みに失敗しました</option>';
+            }
+        });
+
+        window.handleDateChange = function() {
+            const selectedDate = document.getElementById('pickup-date').value;
+            if (window.currentOrderType === 'kobo' && selectedDate) {
+                const stockData = salesDaysData[selectedDate] || {};
+                updateQuantityDropdowns(stockData, 'kobo');
+            } else {
+                updateQuantityDropdowns(0, 'kobo');
+            }
+        }
+
+        function updateQuantityDropdowns(stockSource, type) {
+            const selects = document.querySelectorAll('.quantity-select select');
+            
+            selects.forEach(select => {
+                const productName = select.getAttribute('data-name');
+                const noticeEl = document.getElementById(`stock-notice-${productName}`);
+                const currentVal = select.value;
+
+                let maxQty = 0;
+                if (type === 'reito') {
+                    maxQty = 10;
+                    if (noticeEl) noticeEl.innerText = "";
+                } else {
+                    maxQty = (stockSource && stockSource[productName] !== undefined) ? stockSource[productName] : 0;
+                    if (noticeEl) {
+                        noticeEl.innerText = stockSource ? `残り: ${maxQty}個` : "";
+                    }
+                }
+
+                select.innerHTML = '';
+                for (let i = 0; i <= maxQty; i++) {
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    opt.innerText = i;
+                    select.appendChild(opt);
+                }
+
+                if (parseInt(currentVal) <= maxQty) {
+                    select.value = currentVal;
+                } else {
+                    select.value = "0";
+                }
+            });
+        }
+
+        window.switchType = function(type) {
+            const btnKobo = document.getElementById('btn-kobo');
+            const btnReito = document.getElementById('btn-reito');
+            const formKobo = document.getElementById('form-kobo');
+            const formReito = document.getElementById('form-reito');
+
+            if (type === 'kobo') {
+                btnKobo.classList.add('active');
+                btnReito.classList.remove('active');
+                formKobo.classList.remove('hidden');
+                formReito.classList.add('hidden');
+                window.currentOrderType = 'kobo';
+                handleDateChange();
+            } else {
+                btnKobo.classList.remove('active');
+                btnReito.classList.add('active');
+                formKobo.classList.add('hidden');
+                formReito.classList.remove('hidden');
+                window.currentOrderType = 'reito';
+                updateQuantityDropdowns(null, 'reito');
+            }
+        }
+        
+        window.currentOrderType = 'kobo';
+
+        window.submitOrder = async function() {
+            try {
+                const user = auth.currentUser;
+                if (!user) {
+                    alert("注文するにはマイページからログインしてください。");
+                    return;
+                }
+
+                if (!user.emailVerified) {
+                    alert("メールアドレスの認証が完了していません。\nマイページから認証メールを確認するか、再送してください。");
+                    return;
+                }
+
+                const items = {};
+                let totalPrice = 0;
+                const menuCards = document.querySelectorAll('.menu-card');
+                
+                menuCards.forEach(card => {
+                    const h3 = card.querySelector('h3');
+                    const name = h3.innerText;
+                    const priceText = card.querySelector('.menu-price').innerText;
+                    const select = card.querySelector('.quantity-select select');
+                    
+                    const quantity = parseInt(select.value);
+                    if (quantity > 0) {
+                        const price = parseInt(priceText.replace('¥', ''));
+                        items[name] = quantity;
+                        totalPrice += price * quantity;
+                    }
+                });
+
+                if (totalPrice === 0) {
+                    alert("商品が選択されていません。数量を選んでください。");
+                    return;
+                }
+
+                let salesDayRef = null;
+                if (window.currentOrderType === 'kobo') {
+                    const date = document.getElementById('pickup-date').value;
+                    if (!date) { alert("受取希望日を選択してください。"); return; }
+                    
+                    salesDayRef = db.collection("sales_days").doc(date);
+                    
+                    await db.runTransaction(async (transaction) => {
+                        const sfDoc = await transaction.get(salesDayRef);
+                        if (!sfDoc.exists) {
+                            throw new Error("選択された販売日のデータが存在しません。");
+                        }
+
+                        const currentStock = sfDoc.data().stock || {};
+                        const newStock = { ...currentStock };
+
+                        for (const [name, qty] of Object.entries(items)) {
+                            const available = currentStock[name] || 0;
+                            if (available < qty) {
+                                throw new Error(`申し訳ありません。\n「${name}」の残り在庫（現在残り ${available} 個）が不足しているため、注文を確定できませんでした。`);
+                            }
+                            newStock[name] = available - qty;
+                        }
+
+                        transaction.update(salesDayRef, { stock: newStock });
+                    });
+                }
+
+                const now = new Date();
+                const expireAt = new Date(now.getTime() + 60 * 60 * 1000);
+
+                const orderData = {
+                    userId: user.uid,
+                    email: user.email,
+                    orderType: window.currentOrderType,
+                    items: items,
+                    totalPrice: totalPrice,
+                    status: "pending", 
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expireAt: firebase.firestore.Timestamp.fromDate(expireAt)
+                };
+
+                if (window.currentOrderType === 'kobo') {
+                    orderData.pickupDate = document.getElementById('pickup-date').value;
+                    orderData.pickupTime = document.getElementById('pickup-time').value;
+                } else {
+                    const range = document.getElementById('shipping-range').value;
+                    const address = document.getElementById('address').value;
+                    if (!address) { alert("お届け先住所を入力してください。"); return; }
+                    orderData.shippingRange = range;
+                    orderData.address = address;
+                }
+
+                const notes = document.getElementById('notes').value;
+                if (notes) {
+                    orderData.notes = notes;
+                }
+
+                const docRef = await db.collection("orders").add(orderData);
+                const workersUrl = "https://mir-order-api.mir-boy-20120508.workers.dev/"; 
+
+                try {
+                    const emailResponse = await fetch(workersUrl, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            orderId: docRef.id,
+                            email: user.email,
+                            totalPrice: totalPrice,
+                            items: items,
+                            orderType: window.currentOrderType,
+                            pickupDate: orderData.pickupDate || null,
+                            pickupTime: orderData.pickupTime || null,
+                            shippingRange: orderData.shippingRange || null,
+                            address: orderData.address || null,
+                            notes: orderData.notes || null
+                        })
+                    });
+
+                    const emailResult = await emailResponse.json();
+                    if (!emailResult.success) {
+                        console.error("メール送信APIエラー:", emailResult.error);
+                    }
+                } catch (err) {
+                    console.error("Workersへの通信に失敗しました:", err);
+                }
+
+                window.location.href = 'order-pending.html';
+
+            } catch (error) {
+                alert("❌ " + error.message);
+            }
+        }
     </script>
 </body>
 </html>
