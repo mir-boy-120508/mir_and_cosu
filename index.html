@@ -192,6 +192,16 @@
             font-size: 0.85rem;
             margin-top: 50px;
         }
+        /* 見出しリンクのスタイル */
+        .marche-title-link {
+            color: #8b5a2b;
+            text-decoration: none; /* 下線を消す */
+            transition: color 0.3s;
+        }
+
+        .marche-title-link:hover {
+            color: #d27d2d; /* カーソルを合わせた時にオレンジにする */
+        }
     </style>
 </head>
 <body>
@@ -227,7 +237,7 @@
         </section>
 
         <section class="marche-section">
-            <h2>マルシェ出店情報</h2>
+        <h2><a href="/marche" class="marche-title-link">マルシェ出店情報</a></h2>
             <p>お近くのマルシェで、みなさまにお会いできるのを楽しみにしています！</p>
             
             <div class="marche-card">
