@@ -1,9 +1,8 @@
-// Firebase SDK の読み込み (CDN)
+// Firebase SDK の読み込み (互換性の高いバージョンを指定)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// コピーしていただいたミール専用のConfig
 const firebaseConfig = {
   apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
   authDomain: "mir-and-cosu.firebaseapp.com",
@@ -14,9 +13,8 @@ const firebaseConfig = {
   measurementId: "G-294PKSL137"
 };
 
-// Firebaseの初期化
 const app = initializeApp(firebaseConfig);
 
-// 各ページで使えるようにexportしておく
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+// 💡 どのHTMLからでも「window.db」や「window.auth」で直接呼べるように仕込みます！
+window.auth = getAuth(app);
+window.db = getFirestore(app);
