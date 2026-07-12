@@ -514,11 +514,28 @@ nav ul li a:hover, nav ul li a.active {
             }
         }
 
-<script type="module" src="./js/app.js"></script>
+<script type="module">
+        // 1. まず最初にFirebaseのSDKと初期化をこの中で行う
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    <script type="module">
-        import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
+            authDomain: "mir-and-cosu.firebaseapp.com",
+            projectId: "mir-and-cosu",
+            storageBucket: "mir-and-cosu.firebasestorage.app",
+            messagingSenderId: "597556523101",
+            appId: "1:597556523101:web:338d402cd97dbf23c15db4",
+            measurementId: "G-294PKSL137"
+        };
 
+        // Firebase初期化
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // タブ切り替え関数（HTMLのインラインから呼べるようにwindowに紐付け）
         window.switchType = function(type) {
             const btnKobo = document.getElementById('btn-kobo');
             const btnReito = document.getElementById('btn-reito');
@@ -542,21 +559,13 @@ nav ul li a:hover, nav ul li a.active {
         
         window.currentOrderType = 'kobo';
 
+        // 💡 注文確定処理
         window.submitOrder = async function() {
-            // 🔥 これでiPadでも絶対に最初のポップアップが動くようになります！
             alert("1. 注文処理を開始しました");
 
             try {
-                // 💡 windowから直接Firebaseのインスタンスを取り出す
-                const authInstance = window.auth;
-                const dbInstance = window.db;
-
-                if (!authInstance || !dbInstance) {
-                    alert("❌ Firebaseの読み込みがまだ完了していないか、初期化に失敗しています。時間を置いてもう一度試すか、リロードしてください。");
-                    return;
-                }
-
-                const user = authInstance.currentUser;
+                // 確実に同じスコープ内の auth を参照
+                const user = auth.currentUser;
                 alert("2. ログイン判定: " + (user ? "ログイン中(" + user.email + ")" : "未ログイン"));
                 
                 if (!user) {
@@ -617,8 +626,8 @@ nav ul li a:hover, nav ul li a.active {
 
                 alert("4. データ作成完了。Firestoreへ送信します...");
 
-                // 💡 取得したdbInstanceを使ってデータを追加
-                const docRef = await addDoc(collection(dbInstance, "orders"), orderData);
+                // 確実に同じスコープ内の db を参照して追加
+                const docRef = await addDoc(collection(db, "orders"), orderData);
                 
                 alert("5. 送信成功！ 注文番号: " + docRef.id);
                 window.location.href = '/mypage';
