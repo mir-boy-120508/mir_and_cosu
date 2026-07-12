@@ -130,34 +130,25 @@
     </div>
 
     <script>
-        // QRコードの読み取りに成功したときの処理
-        function onScanSuccess(decodedText, decodedResult) {
-            // スキャン成功音の代わりにアラートや表示処理を行う
-            document.getElementById("res-order-id").innerText = decodedText;
-            
-            // 読み取り結果エリアを表示状態にする
-            document.getElementById("scan-result").classList.add("active");
-            
-            // 本番はここでFirebaseに「decodedText（注文ID）」を送り、対応するパンのデータを取得します
-        }
+// スキャナーの設定を細かく指定してエラーを回避する
+const config = {
+    fps: 15,
+    qrbox: 250,
+    // カメラの制約を緩くする（iOSやiPadでのOverconstrainedError対策）
+    videoConstraints: {
+        facingMode: "environment" // 背面カメラを優先（無理なら前面）
+    }
+};
 
-        function onScanFailure(error) {
-            // 読み取り失敗時（カメラがQRコードを探している間は常に走り続けるので、通常は何も書かなくてOKです）
-        }
+// スキャナーの初期化と起動
+let html5QrcodeScanner = new Html5QrcodeScanner("reader", config, /* verbose= */ false);
+html5QrcodeScanner.render(onScanSuccess, onScanFailure);
 
-        // スキャナーの初期化と起動
-        // 引数: "reader"は表示するタグのID、fpsは1秒間に何回スキャンするか、qrboxはカメラ内の枠のサイズ
-        let html5QrcodeScanner = new Html5QrcodeScanner(
-            "reader", { fps: 15, qrbox: 250 }
-        );
-        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-
-        // 「お渡し完了」ボタンを押したとき
-        function completePickup() {
-            alert("お渡し完了ステータスに更新しました！（今後Firebaseと連動してデータを書き換えます）");
-            // 画面をリセット
-            document.getElementById("scan-result").classList.remove("active");
-        }
+// 「お渡し完了」ボタンを押したとき
+function completePickup() {
+    alert("お渡し完了ステータスに更新しました！（今後Firebaseと連動してデータを書き換えます）");
+    document.getElementById("scan-result").classList.remove("active");
+}
     </script>
 </body>
 </html>
