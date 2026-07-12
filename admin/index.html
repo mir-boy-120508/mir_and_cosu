@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理者用ホーム | 小さなパン工房ミール</title>
+    
+    <style>
+        /* 全体のリセットと基本設定 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+            color: #4a3b32;
+            background-color: #f5efe6; /* ミールさんらしい落ち着いたベージュ */
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .menu-container {
+            max-width: 800px;
+            width: 100%;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #8b5a2b;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #a08875;
+            margin-bottom: 40px;
+            border-bottom: 2px dashed #eaddd5;
+            padding-bottom: 20px;
+        }
+
+        /* お母様が押しやすい大きなボタンのグリッド */
+        .grid-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        /* メニューカードのスタイル */
+        .menu-card {
+            background-color: #fffaf7;
+            border: 2px solid #eaddd5;
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-decoration: none;
+            color: #4a3b32;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        /* マウスを乗せた時や、スマホでタップした時に大きく沈むアニメーション */
+        .menu-card:hover {
+            transform: translateY(-4px);
+            border-color: #d27d2d;
+            background-color: #fff5ee;
+            box-shadow: 0 4px 12px rgba(210, 125, 45, 0.1);
+        }
+
+        /* わかりやすい大きな絵文字アイコン */
+        .icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+        }
+
+        .title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #8b5a2b;
+            margin-bottom: 8px;
+        }
+
+        .desc {
+            font-size: 0.85rem;
+            color: #7a695e;
+            line-height: 1.4;
+        }
+
+        /* 表のホームページへ戻るリンク */
+        .back-link {
+            display: inline-block;
+            font-size: 0.95rem;
+            color: #a08875;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 8px 16px;
+            border-radius: 6px;
+        }
+        .back-link:hover {
+            color: #d27d2d;
+            background-color: #fff5ee;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="menu-container">
+        <h1>🍞 小さなパン工房ミール</h1>
+        <div class="subtitle">お母さん専用 管理画面ホーム</div>
+
+        <div class="grid-menu">
+            
+            <a href="/dashboard.html" class="menu-card">
+                <div class="icon">📋</div>
+                <div class="title">注文ダッシュボード</div>
+                <div class="desc">今日やお好みの日に届いた予約注文を一覧でまとめて確認できます</div>
+            </a>
+
+            <a href="/admin.html" class="menu-card">
+                <div class="icon">🥖</div>
+                <div class="title">販売日・在庫の管理</div>
+                <div class="desc">次にお店を開く日や、持っていくパンの個数をカレンダーで設定します</div>
+            </a>
+
+            <a href="/marche.html" class="menu-card">
+                <div class="icon">🎪</div>
+                <div class="title">マルシェ出店情報の管理</div>
+                <div class="desc">マルシェのイベント予定を登録して、ホームページと自動連動させます</div>
+            </a>
+
+        </div>
+
+        <a href="/" class="back-link">⬅ お客さま用のホームページを表示する</a>
+    </div>
+
+</body>
+</html>
