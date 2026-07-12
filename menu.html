@@ -518,7 +518,13 @@ nav ul li a:hover, nav ul li a.active {
         import { db, auth } from '/js/app.js';
         import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // グローバル関数として他から呼べるようにwindowに紐付けます
+        // 💡 画面読み込み時にエラーがないかチェック
+        try {
+            console.log("Firebase initialized successfully");
+        } catch(e) {
+            alert("初期化エラー: " + e.message);
+        }
+
         window.switchType = function(type) {
             const btnKobo = document.getElementById('btn-kobo');
             const btnReito = document.getElementById('btn-reito');
@@ -540,78 +546,87 @@ nav ul li a:hover, nav ul li a.active {
             }
         }
         
-        // 初期状態は工房受取
         window.currentOrderType = 'kobo';
 
-        // 💡 注文を確定してFirestoreに保存する関数
         window.submitOrder = async function() {
-            // 1. ログインチェック
-            const user = auth.currentUser;
-            if (!user) {
-                alert("注文するにはマイページからログインしてください。");
-                return;
-            }
+            // 💡 どこで止まったか分かるように目印（ログ）をアラートで出します
+            alert("1. 注文処理を開始しました");
 
-            // 2. 選択されたメニューと数量・金額を集計
-            const items = {};
-            let totalPrice = 0;
-            const menuCards = document.querySelectorAll('.menu-card');
-            
-            menuCards.forEach(card => {
-                const name = card.querySelector('h3').innerText;
-                const priceText = card.querySelector('.menu-price').innerText;
-                const select = card.querySelector('.quantity-select select');
-                
-                if (select) { // 近日発売のクッキーなどはスキップ
-                    const quantity = parseInt(select.value);
-                    if (quantity > 0) {
-                        const price = parseInt(priceText.replace('¥', ''));
-                        items[name] = quantity;
-                        totalPrice += price * quantity;
-                    }
-                }
-            });
-
-            if (totalPrice === 0) {
-                alert("商品が選択されていません。数量を選んでください。");
-                return;
-            }
-
-            // 3. 基本データの作成
-            const orderData = {
-                userId: user.uid,
-                email: user.email,
-                orderType: window.currentOrderType,
-                items: items,
-                totalPrice: totalPrice,
-                status: "ordered", // 初期ステータス：未受取
-                createdAt: serverTimestamp()
-            };
-
-            // 4. タイプ別の個別データを追加
-            if (window.currentOrderType === 'kobo') {
-                const date = document.getElementById('pickup-date').value;
-                const time = document.getElementById('pickup-time').value;
-                if (!date) { alert("受取希望日を入力してください。"); return; }
-                orderData.pickupDate = date;
-                orderData.pickupTime = time;
-            } else {
-                const range = document.getElementById('shipping-range').value;
-                const address = document.getElementById('address').value;
-                if (!address) { alert("お届け先住所を入力してください。"); return; }
-                orderData.shippingRange = range;
-                orderData.address = address;
-            }
-
-            // 5. Firestoreへ保存
             try {
+                // 1. ログインチェック
+                const user = auth.currentUser;
+                alert("2. ログイン判定: " + (user ? "ログイン中(" + user.email + ")" : "未ログイン"));
+                
+                if (!user) {
+                    alert("注文するにはマイページからログインしてください。");
+                    return;
+                }
+
+                // 2. 選択されたメニューと数量・金額を集計
+                const items = {};
+                let totalPrice = 0;
+                const menuCards = document.querySelectorAll('.menu-card');
+                
+                menuCards.forEach(card => {
+                    const name = card.querySelector('h3').innerText;
+                    const priceText = card.querySelector('.menu-price').innerText;
+                    const select = card.querySelector('.quantity-select select');
+                    
+                    if (select) {
+                        const quantity = parseInt(select.value);
+                        if (quantity > 0) {
+                            const price = parseInt(priceText.replace('¥', ''));
+                            items[name] = quantity;
+                            totalPrice += price * quantity;
+                        }
+                    }
+                });
+
+                alert("3. 集計完了 金額: ¥" + totalPrice);
+
+                if (totalPrice === 0) {
+                    alert("商品が選択されていません。数量を選んでください。");
+                    return;
+                }
+
+                // 3. 基本データの作成
+                const orderData = {
+                    userId: user.uid,
+                    email: user.email,
+                    orderType: window.currentOrderType,
+                    items: items,
+                    totalPrice: totalPrice,
+                    status: "ordered",
+                    createdAt: serverTimestamp()
+                };
+
+                // 4. タイプ別の個別データを追加
+                if (window.currentOrderType === 'kobo') {
+                    const date = document.getElementById('pickup-date').value;
+                    const time = document.getElementById('pickup-time').value;
+                    if (!date) { alert("受取希望日を入力してください。"); return; }
+                    orderData.pickupDate = date;
+                    orderData.pickupTime = time;
+                } else {
+                    const range = document.getElementById('shipping-range').value;
+                    const address = document.getElementById('address').value;
+                    if (!address) { alert("お届け先住所を入力してください。"); return; }
+                    orderData.shippingRange = range;
+                    orderData.address = address;
+                }
+
+                alert("4. データ作成完了。Firestoreへ送信します...");
+
+                // 5. Firestoreへ保存
                 const docRef = await addDoc(collection(db, "orders"), orderData);
-                alert("予約が確定しました！注文番号: " + docRef.id);
-                // 注文が完了したらマイページへ移動させる
+                
+                alert("5. 送信成功！ 注文番号: " + docRef.id);
                 window.location.href = '/mypage';
+
             } catch (error) {
-                console.error("注文保存エラー:", error);
-                alert("エラーが発生しました: " + error.message);
+                // 💡 エラーが起きたら画面に詳細を表示
+                alert("❌ エラー発生箇所でキャッチしました:\n" + error.name + "\n" + error.message);
+                console.error(error);
             }
         }
     </script>
