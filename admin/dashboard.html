@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理ダッシュボード | 小さなパン工房ミール</title>
+    
+    <style>
+        /* 全体のリセットと基本設定 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+            color: #4a3b32;
+            background-color: #f5efe6; /* 管理画面は少し落ち着いたベージュ */
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            color: #8b5a2b;
+            border-bottom: 2px solid #8b5a2b;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .refresh-btn {
+            background-color: #d27d2d;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .refresh-btn:hover { background-color: #8b5a2b; }
+
+        /* 統計カード */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: #fff9f5;
+            border: 1px solid #eaddd5;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card p { font-size: 0.85rem; color: #705d53; }
+        .stat-card .num { font-size: 1.8rem; font-weight: bold; color: #d27d2d; }
+
+        /* 注文テーブル */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eaddd5;
+        }
+
+        th {
+            background-color: #705d53;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background-color: #fffaf7;
+        }
+
+        /* ステータスバッジ */
+        .status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .status.pending { background-color: #ffeacc; color: #b26a00; } /* 未受取 */
+        .status.completed { background-color: #d1e7dd; color: #0f5132; } /* 受取済 */
+
+        .order-items {
+            font-size: 0.9rem;
+            color: #55443a;
+            white-space: pre-line; /* 改行を有効にする */
+        }
+
+        .nav-links {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px dashed #eaddd5;
+            display: flex;
+            gap: 20px;
+            font-size: 0.9rem;
+        }
+        .nav-links a { color: #705d53; text-decoration: none; font-weight: bold; }
+        .nav-links a:hover { color: #d27d2d; }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <h1>
+            <span>🍞 ミール 予約注文管理ダッシュボード</span>
+            <button class="refresh-btn" onclick="loadOrders()">🔄 情報を更新</button>
+        </h1>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <p>未お渡しの注文</p>
+                <div class="num" id="count-pending">- 件</div>
+            </div>
+            <div class="stat-card">
+                <p>本日の受取予定</p>
+                <div class="num" id="count-today">- 件</div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>受取希望日</th>
+                        <th>お名前</th>
+                        <th>注文内容</th>
+                        <th>合計金額</th>
+                        <th>状態</th>
+                    </tr>
+                </thead>
+                <tbody id="order-list">
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 30px; color: gray;">注文データを読み込み中...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="nav-links">
+            <a href="/admin-marche.html">🎪 マルシェ管理画面へ</a>
+            <a href="/scan.html">📸 受取スキャナーへ</a>
+            <a href="/">⬅ ホームページを表示</a>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase初期化設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
+            authDomain: "mir-and-cosu.firebaseapp.com",
+            projectId: "mir-and-cosu",
+            storageBucket: "mir-and-cosu.firebasestorage.app",
+            messagingSenderId: "597556523101",
+            appId: "1:597556523101:web:338d402cd97dbf23c15db4",
+            measurementId: "G-294PKSL137"
+        };
+
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        document.addEventListener("DOMContentLoaded", loadOrders);
+
+        // Firestoreから注文データを読み込んで表示する関数
+        async function loadOrders() {
+            const orderListEl = document.getElementById("order-list");
+            try {
+                // 注文データを「受取日」が近い順（昇順）に取得
+                // ※ コレクション名は仮で "orders" としています
+                const snapshot = await db.collection("orders").orderBy("pickupDate", "asc").get();
+                orderListEl.innerHTML = "";
+
+                if (snapshot.empty) {
+                    orderListEl.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 30px; color: gray;">現在、予約注文はありません。</td></tr>`;
+                    updateStats(0, 0);
+                    return;
+                }
+
+                const todayStr = new Date().toISOString().split('T')[0];
+                let pendingCount = 0;
+                let todayCount = 0;
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    
+                    // 統計用のカウント
+                    if (data.status !== "completed") pendingCount++;
+                    if (data.pickupDate === todayStr) todayCount++;
+
+                    // 注文商品のテキスト整形 (例: 「メロンパン x 2 \n 食パン x 1」)
+                    let itemsText = "";
+                    if (Array.isArray(data.items)) {
+                        itemsText = data.items.map(item => `${item.name} × ${item.quantity}`).join("\n");
+                    } else {
+                        itemsText = data.itemsSummary || "詳細なし";
+                    }
+
+                    // ステータスバッジの調整
+                    const statusClass = (data.status === "completed") ? "status completed" : "status pending";
+                    const statusText = (data.status === "completed") ? "受取済" : "未受取";
+
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td><strong>${data.pickupDate || "-"}</strong></td>
+                        <td>${data.userName || "ゲスト"} 様</td>
+                        <td class="order-items">${itemsText}</td>
+                        <td>${data.totalPrice ? `¥${data.totalPrice.toLocaleString()}` : "-"}</td>
+                        <td><span class="${statusClass}">${statusText}</span></td>
+                    `;
+                    orderListEl.appendChild(tr);
+                });
+
+                updateStats(pendingCount, todayCount);
+
+            } catch (error) {
+                console.error("注文データの取得に失敗しました:", error);
+                orderListEl.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red; padding: 30px;">データの読み込みに失敗しました。</td></tr>`;
+            }
+        }
+
+        function updateStats(pending, today) {
+            document.getElementById("count-pending").innerText = pending + " 件";
+            document.getElementById("count-today").innerText = today + " 件";
+        }
+    </script>
+</body>
+</html>
