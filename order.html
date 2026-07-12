@@ -271,7 +271,6 @@
                     <p class="menu-price">¥290</p>
                     <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-
                 <div class="menu-card">
                     <h3>ベーグル（プレーン）</h3>
                     <p class="menu-price">¥250</p>
@@ -308,7 +307,7 @@
                     <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
                 <div class="menu-card">
-                    <h3>ベーグル（ウインナー）</h3>
+                    <h3>ベーグル（ウインナー Mum）</h3>
                     <p class="menu-price">¥350</p>
                     <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
@@ -332,7 +331,6 @@
                     <p class="menu-price">¥340</p>
                     <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-
                 <div class="menu-card">
                     <h3>ホテルブレッド</h3>
                     <p class="menu-price">¥480</p>
@@ -343,7 +341,6 @@
                     <p class="menu-price">¥510</p>
                     <div class="quantity-select"><span>数量：</span><select><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                 </div>
-
                 <div class="menu-card">
                     <h3>米粉のシフォン（プレーン）</h3>
                     <p class="menu-price">¥250</p>
@@ -475,7 +472,6 @@
                     return;
                 }
 
-                // 💡 【前提条件】ユーザーがメールアドレスの認証を完了しているかチェック
                 if (!user.emailVerified) {
                     alert("メールアドレスの認証が完了していません。\nマイページから認証メールを確認するか、再送してください。");
                     window.location.href = 'mypage.html';
@@ -505,9 +501,8 @@
                     return;
                 }
 
-                // 💡 現在時刻と、1時間後（有効期限切れ自動キャンセル用）の時間をセット
                 const now = new Date();
-                const expireAt = new Date(now.getTime() + 60 * 60 * 1000); // 現在から1時間後
+                const expireAt = new Date(now.getTime() + 60 * 60 * 1000); // 1時間後
 
                 const orderData = {
                     userId: user.uid,
@@ -515,9 +510,9 @@
                     orderType: window.currentOrderType,
                     items: items,
                     totalPrice: totalPrice,
-                    status: "pending", // 💡 ステータスを「仮注文」で保存
+                    status: "pending", 
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    expireAt: firebase.firestore.Timestamp.fromDate(expireAt) // 💡 期限切れ時刻をFirestore用タイムスタンプに変換して保存
+                    expireAt: firebase.firestore.Timestamp.fromDate(expireAt)
                 };
 
                 if (window.currentOrderType === 'kobo') {
@@ -539,12 +534,39 @@
                     orderData.notes = notes;
                 }
 
-                // Firestoreのordersコレクションに保存し、自動生成されたドキュメントIDを取得
+                // ① まずはFirebase Firestoreに保存
                 const docRef = await db.collection("orders").add(orderData);
                 
-                alert("仮注文の申し込みが完了しました！\n登録されたメールアドレスに「注文確定用リンク」をお送りしました。\n1時間以内にリンクを開いて、本確定を行ってください。");
+                // ② 🔗 Cloudflare Workersにデータを送信してメールを飛ばす処理を追加！
+                // ⚠️ 下のURLをご自身のWorkersのURL（https://xxx.xxx.workers.dev）に差し替えてください！
+                const workersUrl = "https://mir-order-api.mir-boy-20120508.workers.dev/"; 
+
+                try {
+                    const emailResponse = await fetch(workersUrl, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            orderId: docRef.id,
+                            email: user.email,
+                            totalPrice: totalPrice,
+                            items: items,
+                            orderType: window.currentOrderType
+                        })
+                    });
+
+                    const emailResult = await emailResponse.json();
+                    if (!emailResult.success) {
+                        console.error("メール送信APIエラー:", emailResult.error);
+                    }
+                } catch (err) {
+                    console.error("Workersへの通信に失敗しました:", err);
+                }
+
+                alert("仮注文の申し込みが完了しました！\n登録されたメールアドレスに「注文確定用リンク」をお送りしました。\n1時間以内にメールを確認して、本確定を行ってください。");
                 
-                // 💡 テスト・開発用に、そのまま確認用URLへ自動でジャンプさせる設定にします
+                // 元の確認画面ジャンプ処理（本番時は確認完了後に誘導するため、一旦mypageやトップへ戻す運用も可能ですが、テスト用にそのまま残します）
                 window.location.href = `confirm.html?id=${docRef.id}`;
 
             } catch (error) {
