@@ -514,11 +514,12 @@ nav ul li a:hover, nav ul li a.active {
             }
         }
 
-<script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
+    <script>
+        // Firebaseの初期化（互換モードの書き方）
         const firebaseConfig = {
             apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
             authDomain: "mir-and-cosu.firebaseapp.com",
@@ -529,18 +530,12 @@ nav ul li a:hover, nav ul li a.active {
             measurementId: "G-294PKSL137"
         };
 
-        const app = initializeApp(firebaseConfig);
-        
-        // 💡 グローバル変数（window）に安全に格納
-        window.koboAuth = getAuth(app);
-        window.koboDb = getFirestore(app);
-    </script>
+        // 初期化を実行
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-    <script type="module">
-        // Firestoreのデータ追加機能だけをインポート
-        import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        // タブ切り替え機能
+        // タブ切り替え関数
         window.switchType = function(type) {
             const btnKobo = document.getElementById('btn-kobo');
             const btnReito = document.getElementById('btn-reito');
@@ -564,21 +559,12 @@ nav ul li a:hover, nav ul li a.active {
         
         window.currentOrderType = 'kobo';
 
-        // 注文確定ボタンの処理
+        // 注文確定の処理
         window.submitOrder = async function() {
-            // これが最初に出ればJavaScriptは生きています！
             alert("1. 注文処理を開始しました");
 
             try {
-                // 先ほど上のタグで仕込んだ初期化済みのインスタンスを取り出す
-                const auth = window.koboAuth;
-                const db = window.koboDb;
-
-                if (!auth || !db) {
-                    alert("❌ Firebaseの通信準備がまだできていません。数秒待ってからもう一度押すか、画面をリロードしてください。");
-                    return;
-                }
-
+                // ログインチェック
                 const user = auth.currentUser;
                 alert("2. ログイン判定: " + (user ? "ログイン中(" + user.email + ")" : "未ログイン"));
                 
@@ -587,7 +573,7 @@ nav ul li a:hover, nav ul li a.active {
                     return;
                 }
 
-                // 2. 選択されたメニューと数量・金額を集計
+                // 商品の集計
                 const items = {};
                 let totalPrice = 0;
                 const menuCards = document.querySelectorAll('.menu-card');
@@ -621,7 +607,7 @@ nav ul li a:hover, nav ul li a.active {
                     items: items,
                     totalPrice: totalPrice,
                     status: "ordered",
-                    createdAt: serverTimestamp()
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp() // 互換モードのタイムスタンプ
                 };
 
                 if (window.currentOrderType === 'kobo') {
@@ -640,8 +626,8 @@ nav ul li a:hover, nav ul li a.active {
 
                 alert("4. データ作成完了。Firestoreへ送信します...");
 
-                // データの送信を実行
-                const docRef = await addDoc(collection(db, "orders"), orderData);
+                // データの追加実行（互換モードの書き方）
+                const docRef = await db.collection("orders").add(orderData);
                 
                 alert("5. 送信成功！ 注文番号: " + docRef.id);
                 window.location.href = '/mypage';
