@@ -415,7 +415,7 @@
                 <textarea id="notes" rows="3" placeholder="アレルギーの相談や、ご要望があればご記入ください。"></textarea>
             </div>
 
-            <button type="button" class="submit-btn" onclick="submitOrder()">予約を確定する（現地払い）</button>
+            <button type="button" class="submit-btn" onclick="submitOrder()">仮予約を申し込む（メール確認へ）</button>
         </section>
     </main>
 
@@ -475,6 +475,13 @@
                     return;
                 }
 
+                // 💡 【前提条件】ユーザーがメールアドレスの認証を完了しているかチェック
+                if (!user.emailVerified) {
+                    alert("メールアドレスの認証が完了していません。\nマイページから認証メールを確認するか、再送してください。");
+                    window.location.href = 'mypage.html';
+                    return;
+                }
+
                 const items = {};
                 let totalPrice = 0;
                 const menuCards = document.querySelectorAll('.menu-card');
@@ -498,14 +505,19 @@
                     return;
                 }
 
+                // 💡 現在時刻と、1時間後（有効期限切れ自動キャンセル用）の時間をセット
+                const now = new Date();
+                const expireAt = new Date(now.getTime() + 60 * 60 * 1000); // 現在から1時間後
+
                 const orderData = {
                     userId: user.uid,
                     email: user.email,
                     orderType: window.currentOrderType,
                     items: items,
                     totalPrice: totalPrice,
-                    status: "ordered",
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    status: "pending", // 💡 ステータスを「仮注文」で保存
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expireAt: firebase.firestore.Timestamp.fromDate(expireAt) // 💡 期限切れ時刻をFirestore用タイムスタンプに変換して保存
                 };
 
                 if (window.currentOrderType === 'kobo') {
@@ -522,9 +534,18 @@
                     orderData.address = address;
                 }
 
-                await db.collection("orders").add(orderData);
-                alert("予約に成功しました！");
-                window.location.href = 'mypage.html';
+                const notes = document.getElementById('notes').value;
+                if (notes) {
+                    orderData.notes = notes;
+                }
+
+                // Firestoreのordersコレクションに保存し、自動生成されたドキュメントIDを取得
+                const docRef = await db.collection("orders").add(orderData);
+                
+                alert("仮注文の申し込みが完了しました！\n登録されたメールアドレスに「注文確定用リンク」をお送りしました。\n1時間以内にリンクを開いて、本確定を行ってください。");
+                
+                // 💡 テスト・開発用に、そのまま確認用URLへ自動でジャンプさせる設定にします
+                window.location.href = `confirm.html?id=${docRef.id}`;
 
             } catch (error) {
                 alert("❌ エラーが発生しました:\n" + error.message);
