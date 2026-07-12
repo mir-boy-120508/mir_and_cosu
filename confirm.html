@@ -246,7 +246,8 @@
         // Firestoreから仮注文データを読み込む
         async function loadOrderData() {
             try {
-                const doc = await db.collection("orders").document(orderId).get();
+                // 💡 document(orderId) から doc(orderId) に修正
+                const doc = await db.collection("orders").doc(orderId).get();
                 if (!doc.exists) {
                     document.getElementById('loading-view').innerText = "❌ 指定された注文データが存在しないか、すでに削除されています。";
                     return;
@@ -322,7 +323,8 @@
                 document.querySelector('.confirm-btn').style.backgroundColor = '#ccc';
                 
                 // 自動でステータスをキャンセルに更新
-                db.collection("orders").document(orderId).update({ status: "cancelled" });
+                // 💡 document(orderId) から doc(orderId) に修正
+                db.collection("orders").doc(orderId).update({ status: "cancelled" });
                 return;
             }
 
@@ -335,7 +337,8 @@
         // 🎉 ボタン処理：最終確定
         async function finalizeOrder() {
             try {
-                await db.collection("orders").document(orderId).update({
+                // 💡 document(orderId) から doc(orderId) に修正
+                await db.collection("orders").doc(orderId).update({
                     status: "ordered",
                     confirmedAt: firebase.firestore.FieldValue.serverTimestamp() // 確定時刻を記録
                 });
@@ -351,7 +354,8 @@
         async function cancelOrderManual() {
             if (!confirm("この注文の申し込みを取り消してもよろしいですか？")) return;
             try {
-                await db.collection("orders").document(orderId).update({
+                // 💡 document(orderId) から doc(orderId) に修正
+                await db.collection("orders").doc(orderId).update({
                     status: "cancelled"
                 });
                 clearInterval(timerInterval);
