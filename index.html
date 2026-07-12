@@ -275,30 +275,45 @@
         }
         const db = firebase.firestore();
 
-        // ページ読み込み時にFirestoreから自動でマルシェ情報を取得する
+　　　// ページ読み込み時にFirestoreから自動で「次の1件だけ」を取得する
         document.addEventListener("DOMContentLoaded", async () => {
             try {
-                const doc = await db.collection("marche_info").doc("next_marche").get();
+                // 今日の日付を取得 (YYYY-MM-DD形式)
+                const todayStr = new Date().toISOString().split('T')[0];
+
+                // 今日以降の日付のデータを、日付が近い順に並べて「1件だけ」取得する
+                const querySnapshot = await db.collection("marche_info")
+                    .where("date", ">=", todayStr)
+                    .orderBy("date", "asc")
+                    .limit(1)
+                    .get();
                 
                 const nameEl = document.getElementById("marche-name");
                 const datetimeEl = document.getElementById("marche-datetime");
                 const locationEl = document.getElementById("marche-location");
                 const descEl = document.getElementById("marche-description");
 
-                if (doc.exists) {
+                if (!querySnapshot.empty) {
+                    // データが存在した場合
+                    const doc = querySnapshot.docs[0];
                     const data = doc.data();
-                    nameEl.innerText = data.name || "出店予定は未定です";
+                    
+                    nameEl.innerText = data.name || "出店予定";
                     datetimeEl.innerText = data.datetime || "-";
                     locationEl.innerText = data.location || "-";
                     
                     if (data.description) {
                         descEl.innerText = data.description;
-                        descEl.style.display = "block"; // 詳細メッセージがある場合のみ表示
+                        descEl.style.display = "block";
                     } else {
                         descEl.style.display = "none";
                     }
                 } else {
+                    // 未来の出店予定が1件もない場合
                     nameEl.innerText = "出店予定は未定です";
+                    datetimeEl.innerText = "-";
+                    locationEl.innerText = "-";
+                    descEl.style.display = "none";
                 }
             } catch (error) {
                 console.error("マルシェ情報の取得に失敗しました:", error);
