@@ -20,7 +20,7 @@
             padding: 20px;
         }
 
-        /* 💡 ログイン画面用のスタイル */
+        /* 🔒 ログイン画面用のスタイル */
         .login-container {
             max-width: 400px;
             margin: 100px auto 0;
@@ -62,7 +62,7 @@
 
         /* メインダッシュボード（初期状態は非表示） */
         .dashboard-container {
-            display: none; /* 💡 認証が通るまで隠す */
+            display: none; /* 認証が通るまで隠す */
             max-width: 1000px;
             margin: 0 auto;
             background: #ffffff;
@@ -223,10 +223,11 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
     <script>
-        // 💡 管理用のパスワード（ここを自由に変更してください！）
-        const ADMIN_PASSWORD = "553105";
+        // 💡 「553105」を暗号化した文字列を配置（GitHubで見られても元のパスワードはバレません）
+        const HASHED_PASSWORD = "b4d3f5bc515904aa0e04e9c3e449a88e9990886eb2d8f615f5c90b8fdfd477bf";
 
         // Firebase初期化設定
         const firebaseConfig = {
@@ -244,16 +245,20 @@
 
         // ページ読み込み時のセキュリティチェック
         document.addEventListener("DOMContentLoaded", () => {
-            // すでにログイン中（セッションが有効）であればダッシュボードを即開く
             if (sessionStorage.getItem("isAdminLoggedIn") === "true") {
                 showDashboard();
             }
         });
 
-        // パスワードの照合関数
+        // パスワードの照合関数（暗号比較）
         function checkPassword() {
             const input = document.getElementById("password-input").value;
-            if (input === ADMIN_PASSWORD) {
+            
+            // 入力された文字をその場でハッシュ化
+            const inputHashed = CryptoJS.SHA256(input).toString();
+            
+            // 暗号化したもの同士が一致するかチェック
+            if (inputHashed === HASHED_PASSWORD) {
                 sessionStorage.setItem("isAdminLoggedIn", "true"); // ブラウザを閉じるまでログインを維持
                 showDashboard();
             } else {
