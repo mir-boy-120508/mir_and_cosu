@@ -102,17 +102,28 @@
             margin-bottom: 30px;
         }
 
-        .item-image-placeholder {
+        /* 💡 画像をドカンと綺麗に見せるための枠設定 */
+        .item-image-container {
             width: 100%;
-            height: 300px;
+            height: 350px;
             background-color: #f0e6df;
             border-radius: 8px;
+            margin-bottom: 25px;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .item-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-image-placeholder {
             color: #a67c52;
             font-size: 4rem;
-            margin-bottom: 25px;
         }
 
         .item-name {
@@ -161,7 +172,6 @@
             font-size: 0.9rem;
         }
 
-        /* 💡 含まれないアレルゲンを薄く表示したい時用のスタイル */
         .allergen-item.none {
             background-color: #eaeaea;
             color: #aaaaaa;
@@ -230,7 +240,7 @@
                 <ul>
                     <li><a href="/index">ホーム</a></li>
                     <li><a href="/menu">メニュー</a></li>
-                    <li><a href="/orderl">注文</a></li>
+                    <li><a href="/order">注文</a></li>
                     <li><a href="/mypage">マイページ</a></li>
                 </ul>
             </nav>
@@ -239,15 +249,19 @@
 
     <main class="container">
         <div class="item-detail-box">
-            <div class="item-image-placeholder">🥯</div>
+            
+            <div class="item-image-container">
+                <img src="/images/bagel-chocolate.jpg" alt="ベーグル（チョコチップ）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="item-image-placeholder" style="display:none;">🥯</div>
+            </div>
             
             <h2 class="item-name">ベーグル（チョコチップ）</h2>
             <p class="item-price">¥320</p>
 
             <div class="item-section-title">商品説明</div>
             <p class="item-text">
-                小さなパン工房ミール看板メニューのもちもち食感のドーナツです。<br>
-                独自の配合で仕上げた生地は、冷めてもしっとりもちもちが続きます。
+                モチモチのベーグル生地に、甘いチョコチップをたっぷりと練り込みました。<br>
+                温めるとチョコがとろりと溶けて、さらに美味しくお召し上がりいただけます。
             </p>
 
             <div class="item-section-title">特定原材料（アレルゲン情報）</div>
