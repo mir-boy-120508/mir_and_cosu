@@ -20,49 +20,7 @@
             padding: 20px;
         }
 
-        /* 🔒 ログイン画面用のスタイル */
-        .login-container {
-            max-width: 400px;
-            margin: 100px auto 0;
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-
-        .login-container h2 {
-            font-size: 1.3rem;
-            color: #8b5a2b;
-            margin-bottom: 20px;
-        }
-
-        .login-container input[type="password"] {
-            width: 100%;
-            padding: 12px;
-            font-size: 1.1rem;
-            border: 2px solid #c2b2a6;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 12px;
-            background-color: #8b5a2b;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .login-btn:hover { background-color: #705d53; }
-
-        /* メインダッシュボード（初期状態は非表示） */
         .dashboard-container {
-            display: none; /* 認証が通るまで隠す */
             max-width: 1000px;
             margin: 0 auto;
             background: #ffffff;
@@ -148,13 +106,13 @@
             font-size: 0.8rem;
             font-weight: bold;
         }
-        .status.pending { background-color: #ffeacc; color: #b26a00; }
-        .status.completed { background-color: #d1e7dd; color: #0f5132; }
+        .status.pending { background-color: #ffeacc; color: #b26a00; } /* 未受取 (確定済み) */
+        .status.completed { background-color: #d1e7dd; color: #0f5132; } /* 受取済 */
 
         .order-items {
             font-size: 0.9rem;
             color: #55443a;
-            white-space: pre-line;
+            white-space: pre-line; /* 改行を有効にする */
             line-height: 1.4;
         }
 
@@ -172,13 +130,7 @@
 </head>
 <body>
 
-    <div id="login-screen" class="login-container">
-        <h2>🔑 管理者認証</h2>
-        <input type="password" id="password-input" placeholder="パスワードを入力してください">
-        <button class="login-btn" onclick="checkPassword()">ログイン</button>
-    </div>
-
-    <div id="dashboard-screen" class="dashboard-container">
+    <div class="dashboard-container">
         <h1>
             <span>🍞 ミール 予約注文管理ダッシュボード</span>
             <button class="refresh-btn" onclick="loadOrders()">🔄 情報を更新</button>
@@ -215,20 +167,16 @@
         </div>
 
         <div class="nav-links">
-            <a href="/marche.html">🎪 マルシェ管理画面へ</a>
-            <a href="/admin.html">🍞 販売日設定へ</a>
+            <a href="/admin-marche.html">🎪 マルシェ管理画面へ</a>
+            <a href="/scan.html">📸 受取スキャナーへ</a>
             <a href="/">⬅ ホームページを表示</a>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
     <script>
-        // 💡 「553105」を暗号化した文字列を配置（GitHubで見られても元のパスワードはバレません）
-        const HASHED_PASSWORD = "b4d3f5bc515904aa0e04e9c3e449a88e9990886eb2d8f615f5c90b8fdfd477bf";
-
         // Firebase初期化設定
         const firebaseConfig = {
             apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
@@ -243,40 +191,13 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // ページ読み込み時のセキュリティチェック
-        document.addEventListener("DOMContentLoaded", () => {
-            if (sessionStorage.getItem("isAdminLoggedIn") === "true") {
-                showDashboard();
-            }
-        });
-
-        // パスワードの照合関数（暗号比較）
-        function checkPassword() {
-            const input = document.getElementById("password-input").value;
-            
-            // 入力された文字をその場でハッシュ化
-            const inputHashed = CryptoJS.SHA256(input).toString();
-            
-            // 暗号化したもの同士が一致するかチェック
-            if (inputHashed === HASHED_PASSWORD) {
-                sessionStorage.setItem("isAdminLoggedIn", "true"); // ブラウザを閉じるまでログインを維持
-                showDashboard();
-            } else {
-                alert("❌ パスワードが違います。");
-            }
-        }
-
-        // ダッシュボードを表示してデータを読み込む
-        function showDashboard() {
-            document.getElementById("login-screen").style.display = "none";
-            document.getElementById("dashboard-screen").style.display = "block";
-            loadOrders();
-        }
+        document.addEventListener("DOMContentLoaded", loadOrders);
 
         // Firestoreから注文データを読み込んで表示する関数
         async function loadOrders() {
             const orderListEl = document.getElementById("order-list");
             try {
+                // 注文データを受取日の近い順に取得
                 const snapshot = await db.collection("orders").orderBy("pickupDate", "asc").get();
                 orderListEl.innerHTML = "";
 
@@ -288,15 +209,18 @@
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     
+                    // 💡 仮受付（"temporary"など、orderedとcompleted以外）のデータはダッシュボードに乗せない
                     if (data.status !== "ordered" && data.status !== "completed") {
                         return; 
                     }
 
                     displayCount++;
 
+                    // 統計用のカウント（確定かつ未受取のものをカウント）
                     if (data.status === "ordered") pendingCount++;
                     if (data.status === "ordered" && data.pickupDate === todayStr) todayCount++;
 
+                    // 💡 注文商品のテキスト整形（商品名 × 個数 がしっかり出るように対応）
                     let itemsText = "";
                     if (Array.isArray(data.items) && data.items.length > 0) {
                         itemsText = data.items.map(item => `・${item.name} × ${item.quantity}`).join("\n");
@@ -306,6 +230,7 @@
                         itemsText = "商品詳細なし";
                     }
 
+                    // ステータスバッジの調整
                     const statusClass = (data.status === "completed") ? "status completed" : "status pending";
                     const statusText = (data.status === "completed") ? "受取済" : "未受取";
 
@@ -320,6 +245,7 @@
                     orderListEl.appendChild(tr);
                 });
 
+                // 表示対象の確定注文が1件もなかった場合
                 if (displayCount === 0) {
                     orderListEl.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 30px; color: gray;">現在、確定された予約注文はありません。</td></tr>`;
                 }
