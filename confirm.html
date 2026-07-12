@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注文内容の最終確認 | 小さなパン工房ミール</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            color: #4a3b32;
+            background-color: #fcf9f5;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            background-color: #ffffff;
+            border-bottom: 2px solid #f0e6df;
+            text-align: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            color: #8b5a2b;
+            font-weight: bold;
+        }
+
+        .confirm-box {
+            background-color: #ffffff;
+            border: 1px solid #eaddd5;
+            border-radius: 8px;
+            padding: 30px 25px;
+            margin-top: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            color: #8b5a2b;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* タイマー表示 */
+        .timer-banner {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 25px;
+            font-size: 1.05rem;
+        }
+
+        .info-group {
+            margin-bottom: 20px;
+            border-bottom: 1px dashed #eaddd5;
+            padding-bottom: 15px;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #a08875;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .item-list {
+            list-style: none;
+            padding-left: 5px;
+        }
+
+        .item-list li {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .total-price {
+            font-size: 1.4rem;
+            color: #d27d2d;
+            font-weight: bold;
+        }
+
+        .btn-group {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .confirm-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #d27d2d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .confirm-btn:hover {
+            background-color: #b5651d;
+        }
+
+        .cancel-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .cancel-btn:hover {
+            background-color: #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            font-weight: bold;
+            padding: 40px 0;
+            color: #a08875;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        footer {
+            background-color: #4a3b32;
+            color: #fcf9f5;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.85rem;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1 class="logo">小さなパン工房ミール</h1>
+    </header>
+
+    <main class="container">
+        <div id="loading-view" class="loading">
+            注文データを読み込んでいます...
+        </div>
+
+        <div id="main-view" class="confirm-box hidden">
+            <h2>注文内容の最終再確認</h2>
+            
+            <div class="timer-banner" id="timer-display">
+                手続き完了まで あと --分--秒
+            </div>
+
+            <div class="info-group">
+                <div class="info-label">注文タイプ</div>
+                <div class="info-value" id="order-type">--</div>
+            </div>
+
+            <div class="info-group">
+                <div class="info-label">ご注文内容</div>
+                <ul class="item-list" id="order-items">
+                    </ul>
+            </div>
+
+            <div class="info-group">
+                <div class="info-label">合計金額</div>
+                <div class="total-price" id="total-price">¥0</div>
+            </div>
+
+            <div class="info-group" id="detail-group">
+                </div>
+
+            <div class="btn-group">
+                <button type="button" class="confirm-btn" onclick="finalizeOrder()">この内容で注文を確定する</button>
+                <button type="button" class="cancel-btn" onclick="cancelOrderManual()">注文を取り消す</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 小さなパン工房ミール. All Rights Reserved.</p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
+            authDomain: "mir-and-cosu.firebaseapp.com",
+            projectId: "mir-and-cosu",
+            storageBucket: "mir-and-cosu.firebasestorage.app",
+            messagingSenderId: "597556523101",
+            appId: "1:597556523101:web:338d402cd97dbf23c15db4",
+            measurementId: "G-294PKSL137"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        // URLから注文ID (?id=xxxxxx) を取得
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('id');
+
+        let expireTime = null;
+        let timerInterval = null;
+
+        if (!orderId) {
+            document.getElementById('loading-view').innerText = "❌ 注文IDが見つかりません。不正なリンクです。";
+        } else {
+            loadOrderData();
+        }
+
+        // Firestoreから仮注文データを読み込む
+        async function loadOrderData() {
+            try {
+                const doc = await db.collection("orders").document(orderId).get();
+                if (!doc.exists) {
+                    document.getElementById('loading-view').innerText = "❌ 指定された注文データが存在しないか、すでに削除されています。";
+                    return;
+                }
+
+                const data = doc.data();
+
+                // すでに確定またはキャンセル済みの場合はガードをかける
+                if (data.status === "ordered") {
+                    document.getElementById('loading-view').innerText = "🎉 この注文はすでに確定しています。マイページをご確認ください。";
+                    return;
+                } else if (data.status === "cancelled") {
+                    document.getElementById('loading-view').innerText = "⚠️ この注文は期限切れか、もしくはキャンセルされています。";
+                    return;
+                }
+
+                // 期限を取得
+                expireTime = data.expireAt.toDate().getTime();
+
+                // データの表示反映
+                document.getElementById('order-type').innerText = data.orderType === 'kobo' ? '工房受取' : '冷凍発送';
+                document.getElementById('total-price').innerText = `¥${data.totalPrice.toLocaleString()}`;
+
+                // 商品リストの構築
+                const itemsUl = document.getElementById('order-items');
+                itemsUl.innerHTML = "";
+                for (const [name, qty] of Object.entries(data.items)) {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span>${name}</span><span>${qty} 個</span>`;
+                    itemsUl.appendChild(li);
+                }
+
+                // 詳細情報の構築
+                const detailGroup = document.getElementById('detail-group');
+                if (data.orderType === 'kobo') {
+                    detailGroup.innerHTML = `
+                        <div class="info-label">受取希望日時</div>
+                        <div class="info-value">${data.pickupDate} / ${data.pickupTime}頃</div>
+                    `;
+                } else {
+                    detailGroup.innerHTML = `
+                        <div class="info-label">お届け先住所</div>
+                        <div class="info-value">${data.address}</div>
+                    `;
+                }
+
+                // 表示の切り替えとタイマー開始
+                document.getElementById('loading-view').classList.add('hidden');
+                document.getElementById('main-view').classList.remove('hidden');
+                
+                startTimer();
+
+            } catch (error) {
+                document.getElementById('loading-view').innerText = "❌ データの読み込みエラー: " + error.message;
+            }
+        }
+
+        // カウントダウンタイマーの処理
+        function startTimer() {
+            updateTimerDisplay();
+            timerInterval = setInterval(updateTimerDisplay, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const now = new Date().getTime();
+            const distance = expireTime - now;
+
+            if (distance < 0) {
+                clearInterval(timerInterval);
+                document.getElementById('timer-display').innerText = "⏳ 期限切れのため自動キャンセルされました。";
+                // 画面ロック処理
+                document.querySelector('.confirm-btn').disabled = true;
+                document.querySelector('.confirm-btn').style.backgroundColor = '#ccc';
+                
+                // 自動でステータスをキャンセルに更新
+                db.collection("orders").document(orderId).update({ status: "cancelled" });
+                return;
+            }
+
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('timer-display').innerText = `⏳ 手続き完了まで あと ${minutes}分 ${seconds}秒`;
+        }
+
+        // 🎉 ボタン処理：最終確定
+        async function finalizeOrder() {
+            try {
+                await db.collection("orders").document(orderId).update({
+                    status: "ordered",
+                    confirmedAt: firebase.firestore.FieldValue.serverTimestamp() // 確定時刻を記録
+                });
+                clearInterval(timerInterval);
+                alert("🎉 ご注文が確定しました！ご予約ありがとうございます！");
+                window.location.href = 'mypage.html';
+            } catch (error) {
+                alert("❌ 確定処理に失敗しました:\n" + error.message);
+            }
+        }
+
+        // ❌ ボタン処理：手動キャンセル
+        async function cancelOrderManual() {
+            if (!confirm("この注文の申し込みを取り消してもよろしいですか？")) return;
+            try {
+                await db.collection("orders").document(orderId).update({
+                    status: "cancelled"
+                });
+                clearInterval(timerInterval);
+                alert("注文を取り消しました。");
+                window.location.href = 'index.html';
+            } catch (error) {
+                alert("❌ キャンセル処理に失敗しました:\n" + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
