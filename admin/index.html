@@ -25,7 +25,7 @@
         }
 
         .menu-container {
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
             background: #ffffff;
             padding: 40px;
@@ -48,10 +48,10 @@
             padding-bottom: 20px;
         }
 
-        /* お母様が押しやすい大きなボタンのグリッド */
+        /* 💡 4つのボタンをバランスよく並べるグリッド設定 */
         .grid-menu {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 25px;
             margin-bottom: 40px;
         }
@@ -69,6 +69,8 @@
             flex-direction: column;
             align-items: center;
             cursor: pointer;
+            min-height: 200px;
+            justify-content: center;
         }
 
         /* マウスを乗せた時や、スマホでタップした時に大きく沈むアニメーション */
@@ -81,12 +83,12 @@
 
         /* わかりやすい大きな絵文字アイコン */
         .icon {
-            font-size: 3.5rem;
-            margin-bottom: 15px;
+            font-size: 3.2rem;
+            margin-bottom: 12px;
         }
 
         .title {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             font-weight: bold;
             color: #8b5a2b;
             margin-bottom: 8px;
@@ -118,7 +120,7 @@
 
     <div class="menu-container">
         <h1>🍞 小さなパン工房ミール</h1>
-        <div class="subtitle">管理画面ホーム</div>
+        <div class="subtitle">お母さん専用 管理画面ホーム</div>
 
         <div class="grid-menu">
             
@@ -126,6 +128,12 @@
                 <div class="icon">📋</div>
                 <div class="title">注文ダッシュボード</div>
                 <div class="desc">今日やお好みの日に届いた予約注文を一覧でまとめて確認できます</div>
+            </a>
+
+            <a href="/admin/scan" class="menu-card">
+                <div class="icon">📸</div>
+                <div class="title">受取スキャナー</div>
+                <div class="desc">お客さまのQRコードをカメラで読み取って、一発で受取完了にします</div>
             </a>
 
             <a href="/admin/admin" class="menu-card">
