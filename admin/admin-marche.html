@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マルシェ情報管理 | 小さなパン工房ミール</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #4a3b32;
+            background-color: #f5efe6;
+            padding: 20px;
+        }
+
+        .admin-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 25px;
+            color: #8b5a2b;
+            border-bottom: 2px dashed #8b5a2b;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #c2b2a6;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background-color: #8b5a2b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #705d53;
+        }
+
+        .current-info {
+            margin-top: 30px;
+            background-color: #fff9f5;
+            border: 1px solid #eaddd5;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .current-info h2 {
+            font-size: 1.1rem;
+            color: #d27d2d;
+            margin-bottom: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        .nav-links a {
+            color: #705d53;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <h1>🎪 次回マルシェ情報の設定</h1>
+
+        <form id="marche-form" onsubmit="updateMarcheInfo(event)">
+            <div class="form-group">
+                <label for="marche-name">マルシェ名</label>
+                <input type="text" id="marche-name" placeholder="例：〇〇オーガニックマルシェ" required>
+            </div>
+
+            <div class="form-group">
+                <label for="marche-datetime">日程（日時）</label>
+                <input type="text" id="marche-datetime" placeholder="例：2026年10月15日(日) 10:00〜15:00" required>
+            </div>
+
+            <div class="form-group">
+                <label for="marche-location">開催場所</label>
+                <input type="text" id="marche-location" placeholder="例：〇〇駅前広場 / ブース番号：A-3" required>
+            </div>
+
+            <div class="form-group">
+                <label for="marche-description">ひとこと・詳細（任意）</label>
+                <textarea id="marche-description" rows="3" placeholder="例：新作ベーグルを持っていきます！"></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">マルシェ情報を更新する</button>
+        </form>
+
+        <div class="current-info">
+            <h2>現在表示中の情報（プレビュー）</h2>
+            <div id="preview-area">読み込み中...</div>
+        </div>
+
+        <div class="nav-links">
+            <a href="/scan.html">📸 受取スキャナーへ</a>
+            <a href="/">⬅ ホームへ戻る</a>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
+            authDomain: "mir-and-cosu.firebaseapp.com",
+            projectId: "mir-and-cosu",
+            storageBucket: "mir-and-cosu.firebasestorage.app",
+            messagingSenderId: "597556523101",
+            appId: "1:597556523101:web:338d402cd97dbf23c15db4",
+            measurementId: "G-294PKSL137"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        // ページ読み込み時に現在の設定を取得
+        document.addEventListener("DOMContentLoaded", loadCurrentMarcheInfo);
+
+        async function loadCurrentMarcheInfo() {
+            try {
+                // ドキュメントID「next_marche」として1件だけ保存・管理します
+                const doc = await db.collection("marche_info").doc("next_marche").get();
+                const preview = document.getElementById("preview-area");
+
+                if (doc.exists) {
+                    const data = doc.data();
+                    document.getElementById("marche-name").value = data.name || "";
+                    document.getElementById("marche-datetime").value = data.datetime || "";
+                    document.getElementById("marche-location").value = data.location || "";
+                    document.getElementById("marche-description").value = data.description || "";
+
+                    preview.innerHTML = `
+                        <p><strong>名前：</strong> ${data.name}</p>
+                        <p><strong>日時：</strong> ${data.datetime}</p>
+                        <p><strong>場所：</strong> ${data.location}</p>
+                        <p><strong>詳細：</strong> ${data.description || 'なし'}</p>
+                    `;
+                } else {
+                    preview.innerHTML = "<p>登録されている情報がありません。</p>";
+                }
+            } catch (error) {
+                console.error("データ取得エラー:", error);
+            }
+        }
+
+        async function updateMarcheInfo(event) {
+            event.preventDefault();
+
+            const marcheData = {
+                name: document.getElementById("marche-name").value,
+                datetime: document.getElementById("marche-datetime").value,
+                location: document.getElementById("marche-location").value,
+                description: document.getElementById("marche-description").value,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                await db.collection("marche_info").doc("next_marche").set(marcheData);
+                alert("マルシェ情報を更新しました！各画面に反映されます。");
+                loadCurrentMarcheInfo();
+            } catch (error) {
+                alert("更新に失敗しました: " + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
