@@ -489,7 +489,7 @@
         <p>&copy; 2026 小さなパン工房ミール. All Rights Reserved.</p>
     </footer>
 
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
@@ -607,11 +607,10 @@
                 alert("5. 送信成功！ 注文番号: " + docRef.id);
                 window.location.href = '/mypage';
 
-} catch (error) {
+            } catch (error) {
                 // 💡 iPadの画面にエラーの正体を直接表示させます
                 alert("❌ エラーが発生しました:\nコード: " + error.code + "\nメッセージ: " + error.message);
                 console.error(error);
-            }
             }
         }
     </script>
