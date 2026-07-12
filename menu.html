@@ -607,9 +607,11 @@
                 alert("5. 送信成功！ 注文番号: " + docRef.id);
                 window.location.href = '/mypage';
 
-            } catch (error) {
-                alert("❌ エラーが発生しました:\n" + error.message);
+} catch (error) {
+                // 💡 iPadの画面にエラーの正体を直接表示させます
+                alert("❌ エラーが発生しました:\nコード: " + error.code + "\nメッセージ: " + error.message);
                 console.error(error);
+            }
             }
         }
     </script>
