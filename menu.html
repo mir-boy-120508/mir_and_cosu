@@ -514,8 +514,105 @@ nav ul li a:hover, nav ul li a.active {
             }
         }
 
-        function submitOrder() {
-            alert('予約の送信処理（今後のフェーズでFirebaseと連動させます！）');
+<script type="module">
+        import { db, auth } from '/js/app.js';
+        import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // グローバル関数として他から呼べるようにwindowに紐付けます
+        window.switchType = function(type) {
+            const btnKobo = document.getElementById('btn-kobo');
+            const btnReito = document.getElementById('btn-reito');
+            const formKobo = document.getElementById('form-kobo');
+            const formReito = document.getElementById('form-reito');
+
+            if (type === 'kobo') {
+                btnKobo.classList.add('active');
+                btnReito.classList.remove('active');
+                formKobo.classList.remove('hidden');
+                formReito.classList.add('hidden');
+                window.currentOrderType = 'kobo';
+            } else {
+                btnKobo.classList.remove('active');
+                btnReito.classList.add('active');
+                formKobo.classList.add('hidden');
+                formReito.classList.remove('hidden');
+                window.currentOrderType = 'reito';
+            }
+        }
+        
+        // 初期状態は工房受取
+        window.currentOrderType = 'kobo';
+
+        // 💡 注文を確定してFirestoreに保存する関数
+        window.submitOrder = async function() {
+            // 1. ログインチェック
+            const user = auth.currentUser;
+            if (!user) {
+                alert("注文するにはマイページからログインしてください。");
+                return;
+            }
+
+            // 2. 選択されたメニューと数量・金額を集計
+            const items = {};
+            let totalPrice = 0;
+            const menuCards = document.querySelectorAll('.menu-card');
+            
+            menuCards.forEach(card => {
+                const name = card.querySelector('h3').innerText;
+                const priceText = card.querySelector('.menu-price').innerText;
+                const select = card.querySelector('.quantity-select select');
+                
+                if (select) { // 近日発売のクッキーなどはスキップ
+                    const quantity = parseInt(select.value);
+                    if (quantity > 0) {
+                        const price = parseInt(priceText.replace('¥', ''));
+                        items[name] = quantity;
+                        totalPrice += price * quantity;
+                    }
+                }
+            });
+
+            if (totalPrice === 0) {
+                alert("商品が選択されていません。数量を選んでください。");
+                return;
+            }
+
+            // 3. 基本データの作成
+            const orderData = {
+                userId: user.uid,
+                email: user.email,
+                orderType: window.currentOrderType,
+                items: items,
+                totalPrice: totalPrice,
+                status: "ordered", // 初期ステータス：未受取
+                createdAt: serverTimestamp()
+            };
+
+            // 4. タイプ別の個別データを追加
+            if (window.currentOrderType === 'kobo') {
+                const date = document.getElementById('pickup-date').value;
+                const time = document.getElementById('pickup-time').value;
+                if (!date) { alert("受取希望日を入力してください。"); return; }
+                orderData.pickupDate = date;
+                orderData.pickupTime = time;
+            } else {
+                const range = document.getElementById('shipping-range').value;
+                const address = document.getElementById('address').value;
+                if (!address) { alert("お届け先住所を入力してください。"); return; }
+                orderData.shippingRange = range;
+                orderData.address = address;
+            }
+
+            // 5. Firestoreへ保存
+            try {
+                const docRef = await addDoc(collection(db, "orders"), orderData);
+                alert("予約が確定しました！注文番号: " + docRef.id);
+                // 注文が完了したらマイページへ移動させる
+                window.location.href = '/mypage';
+            } catch (error) {
+                console.error("注文保存エラー:", error);
+                alert("エラーが発生しました: " + error.message);
+            }
         }
     </script>
 </body>
