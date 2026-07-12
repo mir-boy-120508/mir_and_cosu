@@ -3,68 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>マルシェ情報管理 | 小さなパン工房ミール</title>
+    <title>管理ダッシュボード | 小さなパン工房ミール</title>
+    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #4a3b32; background-color: #f5efe6; padding: 20px; }
-        .admin-container { max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        h1 { font-size: 1.5rem; text-align: center; margin-bottom: 25px; color: #8b5a2b; border-bottom: 2px dashed #8b5a2b; padding-bottom: 10px; }
-        h2 { font-size: 1.1rem; color: #d27d2d; margin-bottom: 15px; padding-left: 8px; border-left: 4px solid #d27d2d; }
-        .section { background-color: #fff9f5; border: 1px solid #eaddd5; border-radius: 8px; padding: 20px; margin-bottom: 25px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.95rem; }
-        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #c2b2a6; border-radius: 4px; font-size: 1rem; }
-        .submit-btn { display: block; width: 100%; padding: 12px; background-color: #8b5a2b; color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; }
-        .submit-btn:hover { background-color: #705d53; }
-        .marche-list { list-style: none; }
-        .marche-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: white; border: 1px solid #eaddd5; border-radius: 6px; margin-bottom: 8px; font-size: 0.9rem; }
-        .delete-btn { background-color: #cc4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
-        .nav-links { display: flex; justify-content: space-between; margin-top: 20px; font-size: 0.9rem; }
-        .nav-links a { color: #705d53; text-decoration: none; }
+        /* 全体のリセットと基本設定 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+            color: #4a3b32;
+            background-color: #f5efe6; /* 管理画面は少し落ち着いたベージュ */
+            padding: 20px;
+        }
+
+        /* 💡 ログイン画面用のスタイル */
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto 0;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .login-container h2 {
+            font-size: 1.3rem;
+            color: #8b5a2b;
+            margin-bottom: 20px;
+        }
+
+        .login-container input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            border: 2px solid #c2b2a6;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #8b5a2b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .login-btn:hover { background-color: #705d53; }
+
+        /* メインダッシュボード（初期状態は非表示） */
+        .dashboard-container {
+            display: none; /* 💡 認証が通るまで隠す */
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            color: #8b5a2b;
+            border-bottom: 2px solid #8b5a2b;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .refresh-btn {
+            background-color: #d27d2d;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .refresh-btn:hover { background-color: #8b5a2b; }
+
+        /* 統計カード */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: #fff9f5;
+            border: 1px solid #eaddd5;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card p { font-size: 0.85rem; color: #705d53; }
+        .stat-card .num { font-size: 1.8rem; font-weight: bold; color: #d27d2d; }
+
+        /* 注文テーブル */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eaddd5;
+        }
+
+        th {
+            background-color: #705d53;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background-color: #fffaf7;
+        }
+
+        /* ステータスバッジ */
+        .status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .status.pending { background-color: #ffeacc; color: #b26a00; }
+        .status.completed { background-color: #d1e7dd; color: #0f5132; }
+
+        .order-items {
+            font-size: 0.9rem;
+            color: #55443a;
+            white-space: pre-line;
+            line-height: 1.4;
+        }
+
+        .nav-links {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px dashed #eaddd5;
+            display: flex;
+            gap: 20px;
+            font-size: 0.9rem;
+        }
+        .nav-links a { color: #705d53; text-decoration: none; font-weight: bold; }
+        .nav-links a:hover { color: #d27d2d; }
     </style>
 </head>
 <body>
 
-    <div class="admin-container">
-        <h1>🎪 マルシェ出店スケジュール管理</h1>
+    <div id="login-screen" class="login-container">
+        <h2>🔑 管理者認証</h2>
+        <input type="password" id="password-input" placeholder="パスワードを入力してください">
+        <button class="login-btn" onclick="checkPassword()">ログイン</button>
+    </div>
 
-        <section class="section">
-            <h2>📅 新しい出店情報の追加</h2>
-            <form id="marche-form" onsubmit="saveMarcheInfo(event)">
-                <div class="form-group">
-                    <label for="marche-date">開催日（自動切替の基準日になります）</label>
-                    <input type="date" id="marche-date" required>
-                </div>
-                <div class="form-group">
-                    <label for="marche-name">マルシェ名</label>
-                    <input type="text" id="marche-name" placeholder="例：〇〇オーガニックマルシェ" required>
-                </div>
-                <div class="form-group">
-                    <label for="marche-datetime">表示用の日時テキスト</label>
-                    <input type="text" id="marche-datetime" placeholder="例：2026年10月15日(日) 10:00〜15:00" required>
-                </div>
-                <div class="form-group">
-                    <label for="marche-location">開催場所</label>
-                    <input type="text" id="marche-location" placeholder="例：〇〇駅前広場" required>
-                </div>
-                <div class="form-group">
-                    <label for="marche-description">ひとこと・詳細（任意）</label>
-                    <textarea id="marche-description" rows="2" placeholder="例：新作ベーグルを持っていきます！"></textarea>
-                </div>
-                <button type="submit" class="submit-btn">マルシェ情報を登録する</button>
-            </form>
-        </section>
+    <div id="dashboard-screen" class="dashboard-container">
+        <h1>
+            <span>🍞 ミール 予約注文管理ダッシュボード</span>
+            <button class="refresh-btn" onclick="loadOrders()">🔄 情報を更新</button>
+        </h1>
 
-        <section class="section">
-            <h2>📋 今後の出店スケジュール（一覧）</h2>
-            <ul class="marche-list" id="marche-schedule-list">
-                <li>読み込み中...</li>
-            </ul>
-        </section>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <p>未お渡しの注文（確定分）</p>
+                <div class="num" id="count-pending">- 件</div>
+            </div>
+            <div class="stat-card">
+                <p>本日の受取予定（確定分）</p>
+                <div class="num" id="count-today">- 件</div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>受取希望日</th>
+                        <th>お名前</th>
+                        <th>注文内容</th>
+                        <th>合計金額</th>
+                        <th>状態</th>
+                    </tr>
+                </thead>
+                <tbody id="order-list">
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 30px; color: gray;">注文データを読み込み中...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
         <div class="nav-links">
-            <a href="/scan.html">📸 受取スキャナーへ</a>
-            <a href="/">⬅ ホームへ戻る</a>
+            <a href="/marche.html">🎪 マルシェ管理画面へ</a>
+            <a href="/admin.html">🍞 販売日設定へ</a>
+            <a href="/">⬅ ホームページを表示</a>
         </div>
     </div>
 
@@ -72,6 +225,10 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
+        // 💡 管理用のパスワード（ここを自由に変更してください！）
+        const ADMIN_PASSWORD = "meal2026admin";
+
+        // Firebase初期化設定
         const firebaseConfig = {
             apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
             authDomain: "mir-and-cosu.firebaseapp.com",
@@ -85,76 +242,94 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        document.addEventListener("DOMContentLoaded", loadMarcheSchedule);
+        // ページ読み込み時のセキュリティチェック
+        document.addEventListener("DOMContentLoaded", () => {
+            // すでにログイン中（セッションが有効）であればダッシュボードを即開く
+            if (sessionStorage.getItem("isAdminLoggedIn") === "true") {
+                showDashboard();
+            }
+        });
 
-        // スケジュール一覧の取得（未来のものだけでなく過去のものも管理用にすべて表示します）
-        async function loadMarcheSchedule() {
-            const listEl = document.getElementById("marche-schedule-list");
+        // パスワードの照合関数
+        function checkPassword() {
+            const input = document.getElementById("password-input").value;
+            if (input === ADMIN_PASSWORD) {
+                sessionStorage.setItem("isAdminLoggedIn", "true"); // ブラウザを閉じるまでログインを維持
+                showDashboard();
+            } else {
+                alert("❌ パスワードが違います。");
+            }
+        }
+
+        // ダッシュボードを表示してデータを読み込む
+        function showDashboard() {
+            document.getElementById("login-screen").style.display = "none";
+            document.getElementById("dashboard-screen").style.display = "block";
+            loadOrders();
+        }
+
+        // Firestoreから注文データを読み込んで表示する関数
+        async function loadOrders() {
+            const orderListEl = document.getElementById("order-list");
             try {
-                const snapshot = await db.collection("marche_info").orderBy("date", "asc").get();
-                listEl.innerHTML = "";
-
-                if (snapshot.empty) {
-                    listEl.innerHTML = "<li>登録されたスケジュールはありません。</li>";
-                    return;
-                }
+                const snapshot = await db.collection("orders").orderBy("pickupDate", "asc").get();
+                orderListEl.innerHTML = "";
 
                 const todayStr = new Date().toISOString().split('T')[0];
+                let pendingCount = 0;
+                let todayCount = 0;
+                let displayCount = 0;
 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    const isPast = data.date < todayStr;
-                    const li = document.createElement("li");
-                    li.className = "marche-item";
-                    li.innerHTML = `
-                        <div>
-                            <strong>${data.date}</strong>: ${data.name} ${isPast ? '<span style="color:gray;">(終了)</span>' : ''}
-                        </div>
-                        <button class="delete-btn" onclick="deleteMarche('${doc.id}')">削除</button>
+                    
+                    if (data.status !== "ordered" && data.status !== "completed") {
+                        return; 
+                    }
+
+                    displayCount++;
+
+                    if (data.status === "ordered") pendingCount++;
+                    if (data.status === "ordered" && data.pickupDate === todayStr) todayCount++;
+
+                    let itemsText = "";
+                    if (Array.isArray(data.items) && data.items.length > 0) {
+                        itemsText = data.items.map(item => `・${item.name} × ${item.quantity}`).join("\n");
+                    } else if (data.itemsSummary) {
+                        itemsText = data.itemsSummary;
+                    } else {
+                        itemsText = "商品詳細なし";
+                    }
+
+                    const statusClass = (data.status === "completed") ? "status completed" : "status pending";
+                    const statusText = (data.status === "completed") ? "受取済" : "未受取";
+
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td><strong>${data.pickupDate || "-"}</strong></td>
+                        <td>${data.userName || "ゲスト"} 様</td>
+                        <td class="order-items">${itemsText}</td>
+                        <td>${data.totalPrice ? `¥${data.totalPrice.toLocaleString()}` : "-"}</td>
+                        <td><span class="${statusClass}">${statusText}</span></td>
                     `;
-                    listEl.appendChild(li);
+                    orderListEl.appendChild(tr);
                 });
+
+                if (displayCount === 0) {
+                    orderListEl.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 30px; color: gray;">現在、確定された予約注文はありません。</td></tr>`;
+                }
+
+                updateStats(pendingCount, todayCount);
+
             } catch (error) {
-                console.error(error);
-                listEl.innerHTML = "<li>データの取得に失敗しました。</li>";
+                console.error("注文データの取得に失敗しました:", error);
+                orderListEl.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red; padding: 30px;">データの読み込みに失敗しました。</td></tr>`;
             }
         }
 
-        // データの登録
-        async function saveMarcheInfo(event) {
-            event.preventDefault();
-            const dateId = document.getElementById("marche-date").value; // YYYY-MM-DD
-
-            const marcheData = {
-                date: dateId,
-                name: document.getElementById("marche-name").value,
-                datetime: document.getElementById("marche-datetime").value,
-                location: document.getElementById("marche-location").value,
-                description: document.getElementById("marche-description").value,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            try {
-                // 日付をドキュメントIDにして保存
-                await db.collection("marche_info").doc(dateId).set(marcheData);
-                alert("マルシェ情報を登録しました！");
-                document.getElementById("marche-form").reset();
-                loadMarcheSchedule();
-            } catch (error) {
-                alert("登録に失敗しました: " + error.message);
-            }
-        }
-
-        // データの削除
-        async function deleteMarche(id) {
-            if (!confirm("このマルシェスケジュールを削除しますか？")) return;
-            try {
-                await db.collection("marche_info").doc(id).delete();
-                alert("削除しました。");
-                loadMarcheSchedule();
-            } catch (error) {
-                alert("削除に失敗しました: " + error.message);
-            }
+        function updateStats(pending, today) {
+            document.getElementById("count-pending").innerText = pending + " 件";
+            document.getElementById("count-today").innerText = today + " 件";
         }
     </script>
 </body>
