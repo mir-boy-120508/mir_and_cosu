@@ -115,7 +115,7 @@
             border: 2px solid #d27d2d;
             border-radius: 12px;
             padding: 30px;
-            margin-bottom: 40px;
+            margin-bottom: 30px; /* 💡 カード間の余白 */
             box-shadow: 0 6px 16px rgba(210,125,45,0.05);
             position: relative;
         }
@@ -131,6 +131,14 @@
             font-weight: bold;
             border-radius: 20px;
             letter-spacing: 1px;
+        }
+
+        /* 💡 2番目以降のカードのバッジ色を少し落ち着いたブラウンにする設定 */
+        .marche-highlight.future-marche {
+            border-color: #c2b2a6;
+        }
+        .marche-highlight.future-marche .highlight-badge {
+            background-color: #a67c52;
         }
 
         .marche-title {
@@ -178,13 +186,16 @@
             font-size: 0.95rem;
             color: #55443a;
         }
+        .marche-highlight.future-marche .marche-message {
+            border-left-color: #a67c52;
+        }
 
         /* ご案内セクション */
         .notice-box {
             background-color: #f5efe6;
             border-radius: 8px;
             padding: 20px;
-            margin-top: 30px;
+            margin-top: 40px;
         }
 
         .notice-box h3 {
@@ -232,26 +243,10 @@
 
     <main class="container">
         <h2>マルシェ出店情報</h2>
-        <p class="intro-text">小さなパン工房ミールがお邪魔する、直近のマルシェスケジュールです！</p>
+        <p class="intro-text">小さなパン工房ミールがお邪魔する、今後のマルシェスケジュールです！</p>
         
-        <div class="marche-highlight">
-            <div class="highlight-badge">NEXT MARCHE</div>
-            <h3 class="marche-title" id="marche-name">読み込み中...</h3>
-            
-            <table class="info-table">
-                <tr>
-                    <th>📅 日時</th>
-                    <td id="marche-datetime">-</td>
-                </tr>
-                <tr>
-                    <th>📍 場所</th>
-                    <td id="marche-location">-</td>
-                </tr>
-            </table>
-
-            <div id="marche-desc-box" class="marche-message" style="display: none;">
-                <p id="marche-description"></p>
-            </div>
+        <div id="marche-list-container">
+            <p style="text-align: center; padding: 20px;">スケジュールを読み込み中...</p>
         </div>
 
         <div class="notice-box">
@@ -287,35 +282,67 @@
         }
         const db = firebase.firestore();
 
-        // ページ読み込み時にFirestoreから自動で最新のマルシェ情報を取得
+        // ページ読み込み時にFirestoreから自動で今日以降のマルシェ情報を複数件取得
         document.addEventListener("DOMContentLoaded", async () => {
+            const container = document.getElementById("marche-list-container");
             try {
-                const doc = await db.collection("marche_info").doc("next_marche").get();
-                
-                const nameEl = document.getElementById("marche-name");
-                const datetimeEl = document.getElementById("marche-datetime");
-                const locationEl = document.getElementById("marche-location");
-                const descBox = document.getElementById("marche-desc-box");
-                const descEl = document.getElementById("marche-description");
+                // 今日の日付を取得 (YYYY-MM-DD形式)
+                const todayStr = new Date().toISOString().split('T')[0];
 
-                if (doc.exists) {
-                    const data = doc.data();
-                    nameEl.innerText = data.name || "出店予定は未定です";
-                    datetimeEl.innerText = data.datetime || "-";
-                    locationEl.innerText = data.location || "-";
-                    
-                    if (data.description) {
-                        descEl.innerText = data.description;
-                        descBox.style.display = "block"; // メッセージがある時だけ表示
-                    } else {
-                        descBox.style.display = "none";
-                    }
-                } else {
-                    nameEl.innerText = "出店予定は未定です";
+                // 今日以降の日付のデータを、日付順（近い順）に最大5件取得
+                const querySnapshot = await db.collection("marche_info")
+                    .where("date", ">=", todayStr)
+                    .orderBy("date", "asc")
+                    .limit(5)
+                    .get();
+                
+                container.innerHTML = ""; // 読み込み中テキストをクリア
+
+                if (querySnapshot.empty) {
+                    container.innerHTML = "<p style='text-align: center; padding: 30px; color: #705d53;'>現在、次回の出店予定は未定です。決まり次第こちらでお知らせします！</p>";
+                    return;
                 }
+
+                // ループ処理でカードを動的に生成
+                querySnapshot.forEach((doc, index) => {
+                    const data = doc.data();
+                    
+                    // 1番近いマルシェは「次回出店」、2番目以降は「出店予定」とバッジとスタイルを分ける
+                    const isFirst = (index === 0);
+                    const badgeText = isFirst ? "次回出店" : "出店予定";
+                    const cardClass = isFirst ? "marche-highlight" : "marche-highlight future-marche";
+
+                    const marcheCard = document.createElement("div");
+                    marcheCard.className = cardClass;
+                    
+                    marcheCard.innerHTML = `
+                        <div class="highlight-badge">${badgeText}</div>
+                        <h3 class="marche-title">${data.name || '出店予定'}</h3>
+                        
+                        <table class="info-table">
+                            <tr>
+                                <th>📅 日時</th>
+                                <td>${data.datetime || '-'}</td>
+                            </tr>
+                            <tr>
+                                <th>📍 場所</th>
+                                <td>${data.location || '-'}</td>
+                            </tr>
+                        </table>
+
+                        ${data.description ? `
+                            <div class="marche-message">
+                                <p>${data.description}</p>
+                            </div>
+                        ` : ''}
+                    `;
+                    
+                    container.appendChild(marcheCard);
+                });
+
             } catch (error) {
                 console.error("マルシェ情報の取得に失敗しました:", error);
-                document.getElementById("marche-name").innerText = "情報の読み込みに失敗しました";
+                container.innerHTML = "<p style='text-align: center; color: red; padding: 20px;'>情報の読み込みに失敗しました</p>";
             }
         });
     </script>
