@@ -381,7 +381,9 @@
             <div id="form-kobo">
                 <div class="form-group">
                     <label for="pickup-date">受取希望日</label>
-                    <input type="date" id="pickup-date">
+                    <select id="pickup-date">
+                        <option value="">販売日を読み込み中...</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="pickup-time">受取希望時間</label>
@@ -440,6 +442,47 @@
         }
         const auth = firebase.auth();
         const db = firebase.firestore();
+
+        // 💡 修正：画面ロード時にFirestoreから販売日を自動取得してプルダウンに反映する処理
+        document.addEventListener("DOMContentLoaded", async () => {
+            const pickupDateSelect = document.getElementById('pickup-date');
+            try {
+                const snapshot = await db.collection("sales_days")
+                                           .where("status", "==", "open")
+                                           .orderBy("date", "asc")
+                                           .get();
+                
+                pickupDateSelect.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.innerText = '現在、ご予約可能な販売日はありません';
+                    pickupDateSelect.appendChild(option);
+                    return;
+                }
+                
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.innerText = '選択してください';
+                pickupDateSelect.appendChild(defaultOption);
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const option = document.createElement('option');
+                    option.value = data.date; 
+                    
+                    const dateObj = new Date(data.date);
+                    const formattedDate = `${dateObj.getFullYear()}年${String(dateObj.getMonth() + 1).padStart(2, '0')}月${String(dateObj.getDate()).padStart(2, '0')}日`;
+                    
+                    option.innerText = formattedDate;
+                    pickupDateSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error("販売日の取得に失敗しました:", error);
+                pickupDateSelect.innerHTML = '<option value="">販売日の読み込みに失敗しました</option>';
+            }
+        });
 
         window.switchType = function(type) {
             const btnKobo = document.getElementById('btn-kobo');
@@ -518,7 +561,7 @@
                 if (window.currentOrderType === 'kobo') {
                     const date = document.getElementById('pickup-date').value;
                     const time = document.getElementById('pickup-time').value;
-                    if (!date) { alert("受取希望日を入力してください。"); return; }
+                    if (!date) { alert("受取希望日を選択してください。"); return; }
                     orderData.pickupDate = date;
                     orderData.pickupTime = time;
                 } else {
@@ -534,10 +577,10 @@
                     orderData.notes = notes;
                 }
 
-                // ① Firebase Firestoreに保存
+                // ① Firebase Firestoreに注文を保存
                 const docRef = await db.collection("orders").add(orderData);
                 
-                // ② Cloudflare Workersにデータを送信してメールを飛ばす
+                // ② Cloudflare Workersにお母様・お客様両方のデータ通知用に拡張して送信
                 const workersUrl = "https://mir-order-api.mir-boy-20120508.workers.dev/"; 
 
                 try {
@@ -551,7 +594,13 @@
                             email: user.email,
                             totalPrice: totalPrice,
                             items: items,
-                            orderType: window.currentOrderType
+                            orderType: window.currentOrderType,
+                            // お母様への通知用に情報を追加
+                            pickupDate: orderData.pickupDate || null,
+                            pickupTime: orderData.pickupTime || null,
+                            shippingRange: orderData.shippingRange || null,
+                            address: orderData.address || null,
+                            notes: orderData.notes || null
                         })
                     });
 
@@ -563,7 +612,7 @@
                     console.error("Workersへの通信に失敗しました:", err);
                 }
 
-                // ⭕ 修正：confirm.htmlではなく、新設する「メール案内用の専用ページ」へリダイレクト！
+                // 案内用の専用ページへリダイレクト
                 window.location.href = 'order-pending.html';
 
             } catch (error) {
