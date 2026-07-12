@@ -102,17 +102,28 @@
             margin-bottom: 30px;
         }
 
-        .item-image-placeholder {
+        /* 💡 画像を綺麗に大きく見せる枠設定（統一スタイル） */
+        .item-image-container {
             width: 100%;
-            height: 300px;
+            height: 350px;
             background-color: #f0e6df;
             border-radius: 8px;
+            margin-bottom: 25px;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .item-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-image-placeholder {
             color: #a67c52;
             font-size: 4rem;
-            margin-bottom: 25px;
         }
 
         .item-name {
@@ -159,14 +170,6 @@
             color: #705d53;
             font-weight: bold;
             font-size: 0.9rem;
-        }
-
-        /* 💡 含まれないアレルゲンを薄く表示したい時用のスタイル */
-        .allergen-item.none {
-            background-color: #eaeaea;
-            color: #aaaaaa;
-            text-decoration: line-through;
-            font-weight: normal;
         }
 
         /* ページ移動ボタン */
@@ -230,7 +233,7 @@
                 <ul>
                     <li><a href="/index">ホーム</a></li>
                     <li><a href="/menu">メニュー</a></li>
-                    <li><a href="/orderl">注文</a></li>
+                    <li><a href="/order">注文</a></li>
                     <li><a href="/mypage">マイページ</a></li>
                 </ul>
             </nav>
@@ -239,15 +242,19 @@
 
     <main class="container">
         <div class="item-detail-box">
-            <div class="item-image-placeholder">🥯</div>
+            
+            <div class="item-image-container">
+                <img src="/images/bagel-fig.jpg" alt="ベーグル（いちじくキャラメルナッツ）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="item-image-placeholder" style="display:none;">🥯</div>
+            </div>
             
             <h2 class="item-name">ベーグル（いちじくキャラメルナッツ）</h2>
             <p class="item-price">¥340</p>
 
             <div class="item-section-title">商品説明</div>
             <p class="item-text">
-                小さなパン工房ミール看板メニューのもちもち食感のドーナツです。<br>
-                独自の配合で仕上げた生地は、冷めてもしっとりもちもちが続きます。
+                ミール特製のもっちり噛み応えのあるベーグル生地に、プチプチとした食感が楽しいドライいちじくと香ばしいキャラメルナッツをふんだんに練り込みました。<br>
+                いちじくの芳醇な甘みと、ほろ苦いキャラメルが絡んだナッツのカリッとした食感が贅沢に重なり合います。コーヒーや紅茶との相性も抜群な、まるでスイーツのような味わい深い大人なベーグルです。
             </p>
 
             <div class="item-section-title">特定原材料（アレルゲン情報）</div>
