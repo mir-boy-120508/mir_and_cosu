@@ -28,73 +28,73 @@
             padding: 40px 20px;
         }
 
-/* ヘッダー */
-header {
-    background-color: #ffffff;
-    border-bottom: 2px solid #f0e6df;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
+        /* ヘッダー */
+        header {
+            background-color: #ffffff;
+            border-bottom: 2px solid #f0e6df;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-.header-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column; /* 💡 スマホでは縦並びにする */
-    align-items: center;
-    gap: 10px; /* ロゴとナビの間に少し隙間を作る */
-    padding: 15px 10px;
-}
+        .header-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column; /* 💡 スマホでは縦並びにする */
+            align-items: center;
+            gap: 10px;
+            padding: 15px 10px;
+        }
 
-.logo {
-    font-size: 1.4rem;
-    color: #8b5a2b;
-    text-align: center;
-    font-weight: bold;
-}
+        .logo {
+            font-size: 1.4rem;
+            color: #8b5a2b;
+            text-align: center;
+            font-weight: bold;
+        }
 
-nav ul {
-    display: flex;
-    list-style: none;
-    justify-content: center;
-}
+        nav ul {
+            display: flex;
+            list-style: none;
+            justify-content: center;
+        }
 
-nav ul li {
-    margin: 0 10px; /* 💡 左右の余白を少し狭めてスマホに収める */
-}
+        nav ul li {
+            margin: 0 10px;
+        }
 
-nav ul li a {
-    text-decoration: none;
-    color: #705d53;
-    font-weight: bold;
-    font-size: 0.9rem; /* 💡 文字サイズを少しだけ小さく */
-    transition: color 0.3s;
-    white-space: nowrap; /* 💡 文字が途中で改行されるのを防ぐ */
-}
+        nav ul li a {
+            text-decoration: none;
+            color: #705d53;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+            white-space: nowrap;
+        }
 
-nav ul li a:hover, nav ul li a.active {
-    color: #d27d2d;
-}
+        nav ul li a:hover, nav ul li a.active {
+            color: #d27d2d;
+        }
 
-/* 💻 画面が広いパソコンで見るとき用の設定 */
-@media (min-width: 600px) {
-    .header-container {
-        flex-direction: row; /* パソコンでは横並びに戻す */
-        justify-content: space-between;
-        padding: 15px 20px;
-    }
-    nav ul li {
-        margin-left: 20px;
-        margin-right: 0;
-    }
-    .logo {
-        font-size: 1.5rem;
-    }
-    nav ul li a {
-        font-size: 0.95rem;
-    }
-}
+        @media (min-width: 600px) {
+            .header-container {
+                flex-direction: row;
+                justify-content: space-between;
+                padding: 15px 20px;
+            }
+            nav ul li {
+                margin-left: 20px;
+                margin-right: 0;
+            }
+            .logo {
+                font-size: 1.5rem;
+            }
+            nav ul li a {
+                font-size: 0.95rem;
+            }
+        }
+
         /* 会員情報カード */
         .user-profile {
             background-color: #ffffff;
@@ -107,7 +107,7 @@ nav ul li a:hover, nav ul li a.active {
         /* 予約（QRコード）カード */
         .order-card {
             background-color: #ffffff;
-            border: 2px solid #d27d2d; /* 目立つようにオレンジブラウンの枠線 */
+            border: 2px solid #d27d2d;
             border-radius: 8px;
             padding: 25px;
             margin-bottom: 25px;
@@ -130,7 +130,7 @@ nav ul li a:hover, nav ul li a.active {
             font-size: 0.95rem;
         }
 
-        /* QRコードを表示するエリアのスタイル */
+        /* QRコードを表示するエリア */
         .qrcode-area {
             display: flex;
             flex-direction: column;
@@ -149,39 +149,16 @@ nav ul li a:hover, nav ul li a.active {
             padding: 10px;
             background-color: white;
             border: 1px solid #eee;
+            min-height: 180px; /* QR生成前のガタつき防止 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .qrcode-hint {
             font-size: 0.85rem;
             color: #705d53;
             font-weight: bold;
-        }
-
-        /* 過去の履歴リスト */
-        .history-list {
-            list-style: none;
-        }
-
-        .history-item {
-            background-color: #ffffff;
-            border: 1px solid #eaddd5;
-            border-radius: 8px;
-            padding: 15px 20px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .history-item-left p {
-            font-size: 0.9rem;
-            color: #705d53;
-        }
-
-        .history-item-right {
-            text-align: right;
-            font-weight: bold;
-            color: #8b5a2b;
         }
 
         /* フッター */
@@ -193,6 +170,15 @@ nav ul li a:hover, nav ul li a.active {
             font-size: 0.85rem;
             margin-top: 50px;
         }
+
+        .no-orders {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border: 1px solid #eaddd5;
+            border-radius: 8px;
+            color: #705d53;
+        }
     </style>
 </head>
 <body>
@@ -202,9 +188,9 @@ nav ul li a:hover, nav ul li a.active {
             <h1 class="logo">小さなパン工房ミール</h1>
             <nav>
                 <ul>
-                    <li><a href="/">ホーム</a></li>
-                    <li><a href="/menu">メニュー・注文</a></li>
-                    <li><a href="/mypage" class="active">マイページ</a></li>
+                    <li><a href="index.html">ホーム</a></li>
+                    <li><a href="menu.html">メニュー・注文</a></li>
+                    <li><a href="mypage.html" class="active">マイページ</a></li>
                 </ul>
             </nav>
         </div>
@@ -213,40 +199,33 @@ nav ul li a:hover, nav ul li a.active {
     <main class="container">
         <div id="auth-section">
             <h2>ログイン / 新規会員登録</h2>
-            <div class="user-profile" style="margin-bottom: 20px;">
+            <div class="user-profile" style="margin-bottom: 20px; margin-top: 20px;">
                 <h3>メールアドレスでログイン</h3>
                 <br>
                 <input type="email" id="auth-email" placeholder="メールアドレス" style="width:100%; padding:10px; margin-bottom:10px;">
                 <input type="password" id="auth-password" placeholder="パスワード（6文字以上）" style="width:100%; padding:10px; margin-bottom:15px;">
-                <button id="btn-login" style="padding:10px 20px; background:#8b5a2b; color:white; border:none; border-radius:4px; cursor:pointer; margin-right:10px;">ログイン</button>
-                <button id="btn-register" style="padding:10px 20px; background:#705d53; color:white; border:none; border-radius:4px; cursor:pointer;">新規登録</button>
+                <button id="btn-login" style="padding:10px 20px; background:#8b5a2b; color:white; border:none; border-radius:4px; cursor:pointer; margin-right:10px; font-weight:bold;">ログイン</button>
+                <button id="btn-register" style="padding:10px 20px; background:#705d53; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">新規登録</button>
             </div>
         </div>
 
         <div id="mypage-content" style="display: none;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
                 <h2>マイページ</h2>
-                <button id="btn-logout" style="padding:5px 10px; background:#cc0000; color:white; border:none; border-radius:4px; cursor:pointer;">ログアウト</button>
+                <button id="btn-logout" style="padding:5px 10px; background:#cc0000; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">ログアウト</button>
             </div>
 
             <section class="user-profile">
                 <h3>ミール 会員情報</h3>
+                <br>
                 <p><strong>ログイン中のメールアドレス：</strong> <span id="user-email-display"></span></p>
             </section>
 
             <section>
                 <h2>現在の予約・受取用QRコード</h2>
-                <div class="order-card">
-                    <div class="order-status-badge">工房受取・未受取</div>
-                    <h3>ご注文内容：ベーグルセット 他</h3>
-                    <p class="order-meta">📅 <strong>受取予定日：</strong> 2026年x月x日 13:00 〜 14:00</p>
-                    <p class="order-meta">🔢 <strong>注文番号：</strong> <span id="order-id">MEAL-20260712-001</span></p>
-                    
-                    <div class="qrcode-area">
-                        <div id="qrcode"></div>
-                        <p class="qrcode-hint">店頭でこのQRコードを店員にご提示ください</p>
-                    </div>
-                    <p style="font-size: 0.9rem;">🥖 ドーナツ（プレーン）× 1<br>🥯 ベーグル（高菜そぼろチーズ）× 2<br>💰 <strong>合計金額：¥970（現地でお支払い）</strong></p>
+                <br>
+                <div id="orders-container">
+                    <div class="no-orders">注文履歴を読み込んでいます...</div>
                 </div>
             </section>
         </div>
@@ -256,57 +235,165 @@ nav ul li a:hover, nav ul li a.active {
         <p>&copy; 2026 小さなパン工房ミール. All Rights Reserved.</p>
     </footer>
 
-    <script type="module">
-        import { checkAuthState, registerEmail, loginEmail, logoutUser } from './js/auth.js';
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-        // QRコード生成（とりあえずダミー）
-        const currentOrderId = "MEAL-20260712-001"; 
-        new QRCode(document.getElementById("qrcode"), {
-            text: currentOrderId,
-            width: 160,
-            height: 160,
-            colorDark : "#4a3b32",
-            colorLight : "#ffffff"
-        });
+    <script>
+        // Firebase設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
+            authDomain: "mir-and-cosu.firebaseapp.com",
+            projectId: "mir-and-cosu",
+            storageBucket: "mir-and-cosu.firebasestorage.app",
+            messagingSenderId: "597556523101",
+            appId: "1:597556523101:web:338d402cd97dbf23c15db4",
+            measurementId: "G-294PKSL137"
+        };
 
-        // ログイン状態によって表示を切り替える
-        checkAuthState((user) => {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ログイン状態の監視
+        auth.onAuthStateChanged(async (user) => {
             const authSection = document.getElementById('auth-section');
             const mypageContent = document.getElementById('mypage-content');
             const emailDisplay = document.getElementById('user-email-display');
 
             if (user) {
-                // ログインしている場合
                 authSection.style.display = 'none';
                 mypageContent.style.display = 'block';
                 emailDisplay.innerText = user.email;
+                
+                // 💡 ログイン成功したら注文データを読み込む
+                await loadUserOrders(user.uid);
             } else {
-                // ログインしていない場合
                 authSection.style.display = 'block';
                 mypageContent.style.display = 'none';
             }
         });
 
-        // ボタンのイベント設定
+        // 💡 Firestoreから注文データを引っ張ってきて画面に表示する関数
+        async function loadUserOrders(userId) {
+            const container = document.getElementById('orders-container');
+            
+            try {
+                // ログイン中ユーザーの注文を、新しい順に取得
+                const snapshot = await db.collection("orders")
+                                         .where("userId", "==", userId)
+                                         .orderBy("createdAt", "desc")
+                                         .get();
+
+                if (snapshot.empty) {
+                    container.innerHTML = `<div class="no-orders">現在のご注文予約はありません。</div>`;
+                    return;
+                }
+
+                container.innerHTML = ""; // 表示をクリア
+
+                // 最新の1件だけを取り出して表示（複数対応にする場合はここをループさせます）
+                const newestOrderDoc = snapshot.docs[0];
+                const order = newestOrderDoc.data();
+                const orderId = newestOrderDoc.id;
+
+                // ステータスの日本語化
+                let statusText = "注文完了・未受取";
+                if (order.status === "preparing") statusText = "ご用意中";
+                if (order.status === "ready") statusText = "受け取り可能";
+                if (order.status === "completed") statusText = "受け取り済み";
+
+                // 注文商品の内訳テキストを作成
+                let itemsHtml = "";
+                for (const [name, qty] of Object.entries(order.items)) {
+                    itemsHtml += `🥖 ${name} × ${qty}<br>`;
+                }
+
+                // 受取または発送の情報を構築
+                let metaHtml = "";
+                if (order.orderType === "kobo") {
+                    metaHtml = `📅 <strong>受取希望日：</strong> ${order.pickupDate} ${order.pickupTime || ""}`;
+                } else {
+                    const rangeText = order.shippingRange === "next-week" ? "来週中に順次発送" : "今月末に順次発送";
+                    metaHtml = `📦 <strong>配送予定：</strong> ${rangeText}<br>📍 <strong>お届け先：</strong> ${order.address}`;
+                }
+
+                // HTMLの組み立て
+                const cardHtml = `
+                    <div class="order-card">
+                        <div class="order-status-badge">${statusText}</div>
+                        <h3>ご注文内容</h3>
+                        <br>
+                        <p class="order-meta">${metaHtml}</p>
+                        <p class="order-meta">🔢 <strong>注文番号：</strong> <span id="order-id-display">${orderId}</span></p>
+                        
+                        <div class="qrcode-area">
+                            <div id="qrcode"></div>
+                            <p class="qrcode-hint">店頭でこのQRコードを店員にご提示ください</p>
+                        </div>
+                        <p style="font-size: 0.95rem; border-top: 1px dashed #eaddd5; padding-top: 15px;">
+                            ${itemsHtml}
+                            <br>
+                            <span style="font-size: 1.1rem; color: #d27d2d;">💰 <strong>合計金額：¥${order.totalPrice.toLocaleString()}（現地でお支払い）</strong></span>
+                        </p>
+                    </div>
+                `;
+
+                container.innerHTML = cardHtml;
+
+                // 💡 本物の注文番号でQRコードを生成！
+                new QRCode(document.getElementById("qrcode"), {
+                    text: orderId,
+                    width: 160,
+                    height: 160,
+                    colorDark : "#4a3b32",
+                    colorLight : "#ffffff"
+                });
+
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = `<div class="no-orders" style="color: red;">データ読み込み中にエラーが発生しました。<br>${error.message}</div>`;
+            }
+        }
+
+        // 会員登録処理
         document.getElementById('btn-register').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
-            const res = await registerEmail(email, password);
-            if(res.success) alert("会員登録に成功しました！");
-            else alert("エラー: " + res.error);
+            if(!email || !password) { alert("メールアドレスとパスワードを入力してください。"); return; }
+            
+            try {
+                await auth.createUserWithEmailAndPassword(email, password);
+                alert("会員登録に成功しました！");
+            } catch (error) {
+                alert("登録エラー: " + error.message);
+            }
         });
 
+        // ログイン処理
         document.getElementById('btn-login').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
-            const res = await loginEmail(email, password);
-            if(res.success) alert("ログインしました！");
-            else alert("エラー: " + res.error);
+            if(!email || !password) { alert("メールアドレスとパスワードを入力してください。"); return; }
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                alert("ログインしました！");
+            } catch (error) {
+                alert("ログインエラー: " + error.message);
+            }
         });
 
+        // ログアウト処理
         document.getElementById('btn-logout').addEventListener('click', async () => {
-            await logoutUser();
-            alert("ログアウトしました。");
+            try {
+                await auth.signOut();
+                alert("ログアウトしました。");
+            } catch (error) {
+                alert("ログアウトエラー: " + error.message);
+            }
         });
     </script>
 </body>
