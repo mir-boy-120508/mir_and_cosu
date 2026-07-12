@@ -192,81 +192,111 @@
             <h1 class="logo">小さなパン工房ミール</h1>
             <nav>
                 <ul>
-                    <li><a href="index.html">ホーム</a></li>
-                    <li><a href="menu.html">メニュー・注文</a></li>
-                    <li><a href="mypage.html" class="active">マイページ</a></li>
+                    <li><a href="/">ホーム</a></li>
+                    <li><a href="/menu">メニュー・注文</a></li>
+                    <li><a href="/mypage" class="active">マイページ</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
     <main class="container">
-        <h2>マイページ</h2>
-
-        <section class="user-profile">
-            <h3>ミール 会員情報</h3>
-            <p><strong>お名前：</strong> みーる 太郎 様</p>
-            <p><strong>メールアドレス：</strong> kobo-meal-tarou@example.com</p>
-        </section>
-
-        <section>
-            <h2>現在の予約・受取用QRコード</h2>
-            
-            <div class="order-card">
-                <div class="order-status-badge">工房受取・未受取</div>
-                <h3>ご注文内容：ベーグルセット 他</h3>
-                <p class="order-meta">📅 <strong>受取予定日：</strong> 2026年x月x日 13:00 〜 14:00</p>
-                <p class="order-meta">🔢 <strong>注文番号：</strong> <span id="order-id">MEAL-20260712-001</span></p>
-                
-                <div class="qrcode-area">
-                    <div id="qrcode"></div>
-                    <p class="qrcode-hint">店頭でこのQRコードを店員にご提示ください</p>
-                </div>
-
-                <p style="font-size: 0.9rem;">🥖 ドーナツ（プレーン）× 1<br>🥯 ベーグル（高菜そぼろチーズ）× 2<br>💰 <strong>合計金額：¥970（現地でお支払い）</strong></p>
+        <div id="auth-section">
+            <h2>ログイン / 新規会員登録</h2>
+            <div class="user-profile" style="margin-bottom: 20px;">
+                <h3>メールアドレスでログイン</h3>
+                <br>
+                <input type="email" id="auth-email" placeholder="メールアドレス" style="width:100%; padding:10px; margin-bottom:10px;">
+                <input type="password" id="auth-password" placeholder="パスワード（6文字以上）" style="width:100%; padding:10px; margin-bottom:15px;">
+                <button id="btn-login" style="padding:10px 20px; background:#8b5a2b; color:white; border:none; border-radius:4px; cursor:pointer; margin-right:10px;">ログイン</button>
+                <button id="btn-register" style="padding:10px 20px; background:#705d53; color:white; border:none; border-radius:4px; cursor:pointer;">新規登録</button>
             </div>
-        </section>
+        </div>
 
-        <section>
-            <h2>過去の購入履歴</h2>
-            <ul class="history-list">
-                <li class="history-item">
-                    <div class="history-item-left">
-                        <h3>冷凍発送分（おまかせパンセット）</h3>
-                        <p>2026年05月10日 発送完了</p>
+        <div id="mypage-content" style="display: none;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2>マイページ</h2>
+                <button id="btn-logout" style="padding:5px 10px; background:#cc0000; color:white; border:none; border-radius:4px; cursor:pointer;">ログアウト</button>
+            </div>
+
+            <section class="user-profile">
+                <h3>ミール 会員情報</h3>
+                <p><strong>ログイン中のメールアドレス：</strong> <span id="user-email-display"></span></p>
+            </section>
+
+            <section>
+                <h2>現在の予約・受取用QRコード</h2>
+                <div class="order-card">
+                    <div class="order-status-badge">工房受取・未受取</div>
+                    <h3>ご注文内容：ベーグルセット 他</h3>
+                    <p class="order-meta">📅 <strong>受取予定日：</strong> 2026年x月x日 13:00 〜 14:00</p>
+                    <p class="order-meta">🔢 <strong>注文番号：</strong> <span id="order-id">MEAL-20260712-001</span></p>
+                    
+                    <div class="qrcode-area">
+                        <div id="qrcode"></div>
+                        <p class="qrcode-hint">店頭でこのQRコードを店員にご提示ください</p>
                     </div>
-                    <div class="history-item-right">
-                        <p>¥3,500</p>
-                    </div>
-                </li>
-                <li class="history-item">
-                    <div class="history-item-left">
-                        <h3>工房受取（米粉のシフォンケーキ 他）</h3>
-                        <p>2026年04月15日 受取済</p>
-                    </div>
-                    <div class="history-item-right">
-                        <p>¥1,250</p>
-                    </div>
-                </li>
-            </ul>
-        </section>
+                    <p style="font-size: 0.9rem;">🥖 ドーナツ（プレーン）× 1<br>🥯 ベーグル（高菜そぼろチーズ）× 2<br>💰 <strong>合計金額：¥970（現地でお支払い）</strong></p>
+                </div>
+            </section>
+        </div>
     </main>
 
     <footer>
         <p>&copy; 2026 小さなパン工房ミール. All Rights Reserved.</p>
     </footer>
 
-    <script>
-        // 本番はFirebaseからログインユーザーの最新の注文IDをここに入れます
+    <script type="module">
+        import { checkAuthState, registerEmail, loginEmail, logoutUser } from '/js/auth.js';
+
+        // QRコード生成（とりあえずダミー）
         const currentOrderId = "MEAL-20260712-001"; 
-        
-        // ライブラリを使って、指定したID（文字列）のQRコードを作ります
         new QRCode(document.getElementById("qrcode"), {
-            text: currentOrderId,  // QRコードに埋め込む文字
-            width: 160,            // 横幅
-            height: 160,           // 縦幅
-            colorDark : "#4a3b32", // QRコード自体の色（お店のブラウンに合わせました）
-            colorLight : "#ffffff" // 背景色
+            text: currentOrderId,
+            width: 160,
+            height: 160,
+            colorDark : "#4a3b32",
+            colorLight : "#ffffff"
+        });
+
+        // ログイン状態によって表示を切り替える
+        checkAuthState((user) => {
+            const authSection = document.getElementById('auth-section');
+            const mypageContent = document.getElementById('mypage-content');
+            const emailDisplay = document.getElementById('user-email-display');
+
+            if (user) {
+                // ログインしている場合
+                authSection.style.display = 'none';
+                mypageContent.style.display = 'block';
+                emailDisplay.innerText = user.email;
+            } else {
+                // ログインしていない場合
+                authSection.style.display = 'block';
+                mypageContent.style.display = 'none';
+            }
+        });
+
+        // ボタンのイベント設定
+        document.getElementById('btn-register').addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const res = await registerEmail(email, password);
+            if(res.success) alert("会員登録に成功しました！");
+            else alert("エラー: " + res.error);
+        });
+
+        document.getElementById('btn-login').addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const res = await loginEmail(email, password);
+            if(res.success) alert("ログインしました！");
+            else alert("エラー: " + res.error);
+        });
+
+        document.getElementById('btn-logout').addEventListener('click', async () => {
+            await logoutUser();
+            alert("ログアウトしました。");
         });
     </script>
 </body>
