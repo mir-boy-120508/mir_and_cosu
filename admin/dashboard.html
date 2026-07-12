@@ -21,7 +21,7 @@
         }
 
         .dashboard-container {
-            max-width: 1000px;
+            max-width: 900px;
             margin: 0 auto;
             background: #ffffff;
             padding: 30px;
@@ -84,8 +84,9 @@
         }
 
         th, td {
-            padding: 12px 15px;
+            padding: 14px 15px;
             border-bottom: 1px solid #eaddd5;
+            vertical-align: top;
         }
 
         th {
@@ -101,19 +102,22 @@
         /* ステータスバッジ */
         .status {
             display: inline-block;
-            padding: 3px 8px;
+            padding: 4px 10px;
             border-radius: 4px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: bold;
+            text-align: center;
         }
         .status.pending { background-color: #ffeacc; color: #b26a00; } /* 未受取 (確定済み) */
         .status.completed { background-color: #d1e7dd; color: #0f5132; } /* 受取済 */
 
+        /* 💡 注文内容が一番大事なので、文字を少し大きめに、読みやすく */
         .order-items {
-            font-size: 0.9rem;
-            color: #55443a;
+            font-size: 1rem;
+            color: #2b1f17;
             white-space: pre-line; /* 改行を有効にする */
-            line-height: 1.4;
+            line-height: 1.5;
+            font-weight: bold;
         }
 
         .nav-links {
@@ -151,16 +155,15 @@
             <table>
                 <thead>
                     <tr>
-                        <th>受取希望日</th>
-                        <th>お名前</th>
-                        <th>注文内容</th>
-                        <th>合計金額</th>
-                        <th>状態</th>
+                        <th style="width: 20%;">受取希望日</th>
+                        <th style="width: 50%;">注文内容</th>
+                        <th style="width: 15%;">合計金額</th>
+                        <th style="width: 15%;">状態</th>
                     </tr>
                 </thead>
                 <tbody id="order-list">
                     <tr>
-                        <td colspan="5" style="text-align: center; padding: 30px; color: gray;">注文データを読み込み中...</td>
+                        <td colspan="4" style="text-align: center; padding: 30px; color: gray;">注文データを読み込み中...</td>
                     </tr>
                 </tbody>
             </table>
@@ -209,7 +212,7 @@
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     
-                    // 💡 仮受付（"temporary"など、orderedとcompleted以外）のデータはダッシュボードに乗せない
+                    // 仮受付（"temporary"など、orderedとcompleted以外）のデータはダッシュボードに乗せない
                     if (data.status !== "ordered" && data.status !== "completed") {
                         return; 
                     }
@@ -220,13 +223,32 @@
                     if (data.status === "ordered") pendingCount++;
                     if (data.status === "ordered" && data.pickupDate === todayStr) todayCount++;
 
-                    // 💡 注文商品のテキスト整形（商品名 × 個数 がしっかり出るように対応）
+                    // 💡 注文商品の解析処理を強力にアップデート！
                     let itemsText = "";
-                    if (Array.isArray(data.items) && data.items.length > 0) {
-                        itemsText = data.items.map(item => `・${item.name} × ${item.quantity}`).join("\n");
-                    } else if (data.itemsSummary) {
+                    
+                    if (data.items) {
+                        if (Array.isArray(data.items)) {
+                            // パターンA: 配列リスト形式の場合 [{name: "あんドーナツ", quantity: 3}]
+                            const activeItems = data.items.filter(item => item.quantity > 0);
+                            itemsText = activeItems.map(item => `・${item.name} × ${item.quantity}個`).join("\n");
+                        } else if (typeof data.items === 'object') {
+                            // パターンB: マップ形式の場合 {"あんドーナツ": 3, "ホテルブレッド": 1}
+                            const itemList = [];
+                            for (const [name, qty] of Object.entries(data.items)) {
+                                if (qty > 0) {
+                                    itemList.push(`・${name} × ${qty}個`);
+                                }
+                            }
+                            itemsText = itemList.join("\n");
+                        }
+                    }
+                    
+                    // もし上記どちらでも取れず、テキスト概要が入っていればそれを使う
+                    if (!itemsText && data.itemsSummary) {
                         itemsText = data.itemsSummary;
-                    } else {
+                    }
+                    // 万が一何もデータがなければ
+                    if (!itemsText) {
                         itemsText = "商品詳細なし";
                     }
 
@@ -237,7 +259,6 @@
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td><strong>${data.pickupDate || "-"}</strong></td>
-                        <td>${data.userName || "ゲスト"} 様</td>
                         <td class="order-items">${itemsText}</td>
                         <td>${data.totalPrice ? `¥${data.totalPrice.toLocaleString()}` : "-"}</td>
                         <td><span class="${statusClass}">${statusText}</span></td>
@@ -247,14 +268,14 @@
 
                 // 表示対象の確定注文が1件もなかった場合
                 if (displayCount === 0) {
-                    orderListEl.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 30px; color: gray;">現在、確定された予約注文はありません。</td></tr>`;
+                    orderListEl.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 30px; color: gray;">現在、確定された予約注文はありません。</td></tr>`;
                 }
 
                 updateStats(pendingCount, todayCount);
 
             } catch (error) {
                 console.error("注文データの取得に失敗しました:", error);
-                orderListEl.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red; padding: 30px;">データの読み込みに失敗しました。</td></tr>`;
+                orderListEl.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red; padding: 30px;">データの読み込みに失敗しました。</td></tr>`;
             }
         }
 
