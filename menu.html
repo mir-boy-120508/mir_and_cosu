@@ -140,16 +140,27 @@
             transform: translateY(-3px);
         }
 
-        .menu-image-placeholder {
+        /* 画像を表示するコンテナのスタイル */
+        .menu-image-container {
             width: 100%;
             height: 180px;
             background-color: #f0e6df;
             border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .menu-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .menu-image-placeholder {
             color: #a67c52;
-            margin-bottom: 15px;
             font-size: 2rem;
         }
 
@@ -254,7 +265,10 @@
         <div class="menu-grid">
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🍩</div>
+                    <div class="menu-image-container">
+                        <img src="/images/donuts-plain.jpg" alt="ドーナツ（プレーン）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🍩</div>
+                    </div>
                     <h3>ドーナツ（プレーン）</h3>
                     <p class="menu-price">¥270</p>
                 </div>
@@ -263,7 +277,10 @@
 
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🍩</div>
+                    <div class="menu-image-container">
+                        <img src="/images/cocoa-donuts.jpg" alt="ココアドーナツ" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🍩</div>
+                    </div>
                     <h3>ココアドーナツ</h3>
                     <p class="menu-price">¥310</p>
                 </div>
@@ -272,7 +289,10 @@
 
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🍩</div>
+                    <div class="menu-image-container">
+                        <img src="/images/an-donuts.jpg" alt="あんドーナツ" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🍩</div>
+                    </div>
                     <h3>あんドーナツ</h3>
                     <p class="menu-price">¥290</p>
                 </div>
@@ -284,7 +304,10 @@
         <div class="menu-grid">
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🥯</div>
+                    <div class="menu-image-container">
+                        <img src="/images/bagel-plain.jpg" alt="ベーグル（プレーン）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🥯</div>
+                    </div>
                     <h3>ベーグル（プレーン）</h3>
                     <p class="menu-price">¥250</p>
                 </div>
@@ -293,7 +316,10 @@
 
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🥯</div>
+                    <div class="menu-image-container">
+                        <img src="/images/bagel-chocolate.jpg" alt="ベーグル（チョコチップ）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🥯</div>
+                    </div>
                     <h3>ベーグル（チョコチップ）</h3>
                     <p class="menu-price">¥320</p>
                 </div>
@@ -302,7 +328,10 @@
 
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🥯</div>
+                    <div class="menu-image-container">
+                        <img src="/images/bagel-chococash.jpg" alt="ベーグル（チョコとくるみ）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🥯</div>
+                    </div>
                     <h3>ベーグル（チョコとくるみ）</h3>
                     <p class="menu-price">¥320</p>
                 </div>
@@ -311,7 +340,10 @@
 
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🥯</div>
+                    <div class="menu-image-container">
+                        <img src="/images/bagel-cheese.jpg" alt="ベーグル（ダブルチーズ）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🥯</div>
+                    </div>
                     <h3>ベーグル（ダブルチーズ）</h3>
                     <p class="menu-price">¥320</p>
                 </div>
@@ -320,7 +352,10 @@
 
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🥯</div>
+                    <div class="menu-image-container">
+                        <img src="/images/bagel-sesami-solt.jpg" alt="ベーグル（黒ごま塩）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🥯</div>
+                    </div>
                     <h3>ベーグル（黒ごま塩）</h3>
                     <p class="menu-price">¥300</p>
                 </div>
@@ -329,7 +364,10 @@
 
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🥯</div>
+                    <div class="menu-image-container">
+                        <img src="/images/bagel-sesame-cheese.jpg" alt="ベーグル（黒ごまチーズ）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🥯</div>
+                    </div>
                     <h3>ベーグル（黒ごまチーズ）</h3>
                     <p class="menu-price">¥320</p>
                 </div>
@@ -338,7 +376,10 @@
 
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🥯</div>
+                    <div class="menu-image-container">
+                        <img src="/images/bagel-onion-bacon.jpg" alt="ベーグル（オニオンチーズベーコン）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🥯</div>
+                    </div>
                     <h3>ベーグル（オニオンチーズベーコン）</h3>
                     <p class="menu-price">¥350</p>
                 </div>
@@ -347,7 +388,10 @@
 
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🥯</div>
+                    <div class="menu-image-container">
+                        <img src="/images/bagel-wiener.jpg" alt="ベーグル（ウインナー）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🥯</div>
+                    </div>
                     <h3>ベーグル（ウインナー）</h3>
                     <p class="menu-price">¥350</p>
                 </div>
@@ -356,7 +400,10 @@
 
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🥯</div>
+                    <div class="menu-image-container">
+                        <img src="/images/bagel-cranberry.jpg" alt="ベーグル（クランベリーとクリームチーズ）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🥯</div>
+                    </div>
                     <h3>ベーグル（クランベリーとクリームチーズ）</h3>
                     <p class="menu-price">¥340</p>
                 </div>
@@ -365,7 +412,10 @@
 
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🥯</div>
+                    <div class="menu-image-container">
+                        <img src="/images/bagel-takana.jpg" alt="ベーグル（高菜そぼろチーズ）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🥯</div>
+                    </div>
                     <h3>ベーグル（高菜そぼろチーズ）</h3>
                     <p class="menu-price">¥350</p>
                 </div>
@@ -374,7 +424,10 @@
 
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🥯</div>
+                    <div class="menu-image-container">
+                        <img src="/images/bagel-anko-cheese.jpg" alt="ベーグル（あんことクリームチーズ）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🥯</div>
+                    </div>
                     <h3>ベーグル（あんことクリームチーズ）</h3>
                     <p class="menu-price">¥340</p>
                 </div>
@@ -383,7 +436,10 @@
 
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🥯</div>
+                    <div class="menu-image-container">
+                        <img src="/images/bagel-fig.jpg" alt="ベーグル（いちじくキャラメルナッツ）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🥯</div>
+                    </div>
                     <h3>ベーグル（いちじくキャラメルナッツ）</h3>
                     <p class="menu-price">¥340</p>
                 </div>
@@ -395,7 +451,10 @@
         <div class="menu-grid">
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🍞</div>
+                    <div class="menu-image-container">
+                        <img src="/images/hotel-bread.jpg" alt="ホテルブレッド" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🍞</div>
+                    </div>
                     <h3>ホテルブレッド</h3>
                     <p class="menu-price">¥480</p>
                 </div>
@@ -404,7 +463,10 @@
 
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🍞</div>
+                    <div class="menu-image-container">
+                        <img src="/images/kokuto-bread.jpg" alt="くるみとレーズンの黒糖食パン" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🍞</div>
+                    </div>
                     <h3>くるみとレーズンの黒糖食パン</h3>
                     <p class="menu-price">¥510</p>
                 </div>
@@ -416,7 +478,10 @@
         <div class="menu-grid">
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🍰</div>
+                    <div class="menu-image-container">
+                        <img src="/images/chiffon-plain.jpg" alt="米粉のシフォン（プレーン）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🍰</div>
+                    </div>
                     <h3>米粉のシフォン（プレーン）</h3>
                     <p class="menu-price">¥250</p>
                 </div>
@@ -425,7 +490,10 @@
 
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🍰</div>
+                    <div class="menu-image-container">
+                        <img src="/images/chiffon-chocolate.jpg" alt="米粉のシフォン（チョコチップ）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🍰</div>
+                    </div>
                     <h3>米粉のシフォン（チョコチップ）</h3>
                     <p class="menu-price">¥270</p>
                 </div>
@@ -434,7 +502,10 @@
 
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🍰</div>
+                    <div class="menu-image-container">
+                        <img src="/images/chiffon-milktea.jpg" alt="米粉のシフォン（ミルクティー）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🍰</div>
+                    </div>
                     <h3>米粉のシフォン（ミルクティー）</h3>
                     <p class="menu-price">¥270</p>
                 </div>
@@ -443,7 +514,10 @@
 
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🍰</div>
+                    <div class="menu-image-container">
+                        <img src="/images/chiffon-coffee.jpg" alt="米粉のシフォン（コーヒーチョコ）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🍰</div>
+                    </div>
                     <h3>米粉のシフォン（コーヒーチョコ）</h3>
                     <p class="menu-price">¥270</p>
                 </div>
@@ -452,7 +526,10 @@
 
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🧀</div>
+                    <div class="menu-image-container">
+                        <img src="/images/cheesecake.jpg" alt="米粉のベイクドチーズケーキ" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🧀</div>
+                    </div>
                     <h3>米粉のベイクドチーズケーキ</h3>
                     <p class="menu-price">¥400</p>
                 </div>
@@ -461,7 +538,10 @@
 
             <div class="menu-card">
                 <div>
-                    <div class="menu-image-placeholder">🍋</div>
+                    <div class="menu-image-container">
+                        <img src="/images/lemon-cake.jpg" alt="米粉のレモンパウンドケーキ" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="menu-image-placeholder" style="display:none;">🍋</div>
+                    </div>
                     <h3>米粉のレモンパウンドケーキ</h3>
                     <p class="menu-price">¥280</p>
                 </div>
