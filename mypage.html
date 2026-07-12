@@ -221,6 +221,16 @@
                 <h3>ミール 会員情報</h3>
                 <br>
                 <p><strong>ログイン中のメールアドレス：</strong> <span id="user-email-display"></span></p>
+                
+                <div id="verification-status" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #eaddd5;">
+                    <p id="status-verified" style="color: #28a745; font-weight: bold; display: none;">✅ メールアドレスは認証済みです</p>
+                    <div id="status-unverified" style="display: none;">
+                        <p style="color: #dc3545; font-weight: bold;">⚠️ メールアドレスの認証が完了していません。</p>
+                        <button id="btn-send-verification" style="margin-top: 10px; padding: 8px 15px; background-color: #d27d2d; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                            認証メールを再送する
+                        </button>
+                    </div>
+                </div>
             </section>
 
             <section>
@@ -238,6 +248,7 @@
     </footer>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
@@ -266,11 +277,23 @@
             const authSection = document.getElementById('auth-section');
             const mypageContent = document.getElementById('mypage-content');
             const emailDisplay = document.getElementById('user-email-display');
+            
+            const statusVerified = document.getElementById('status-verified');
+            const statusUnverified = document.getElementById('status-unverified');
 
             if (user) {
                 authSection.style.display = 'none';
                 mypageContent.style.display = 'block';
                 emailDisplay.innerText = user.email;
+
+                // 💡 メール認証状態によって表示を切り替える
+                if (user.emailVerified) {
+                    statusVerified.style.display = 'block';
+                    statusUnverified.style.display = 'none';
+                } else {
+                    statusVerified.style.display = 'none';
+                    statusUnverified.style.display = 'block';
+                }
                 
                 // 💡 リアルタイムリスナーで注文履歴を追跡開始
                 loadUserOrdersRealtime(user.uid);
@@ -280,6 +303,20 @@
                 if (ordersListener) {
                     ordersListener(); // リスナーを解除
                     ordersListener = null;
+                }
+            }
+        });
+
+        // 💡 認証メール再送処理
+        document.getElementById('btn-send-verification').addEventListener('click', async () => {
+            const user = auth.currentUser;
+            if (user) {
+                try {
+                    await user.sendEmailVerification();
+                    alert("📩 認証メールを再送信しました！メールボックスを確認してください。\n※届かない場合は迷惑メールフォルダもご確認ください。");
+                } catch (error) {
+                    console.error("メール再送エラー:", error);
+                    alert("❌ メールの送信に失敗しました: " + error.message);
                 }
             }
         });
@@ -423,8 +460,10 @@
             if(!email || !password) { alert("メールアドレスとパスワードを入力してください。"); return; }
             
             try {
-                await auth.createUserWithEmailAndPassword(email, password);
-                alert("会員登録に成功しました！");
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                // 💡 新規登録完了と同時に初回認証メールを自動送信する仕組み
+                await userCredential.user.sendEmailVerification();
+                alert("会員登録に成功しました！認証メールを送信したのでご確認ください。");
             } catch (error) {
                 alert("登録エラー: " + error.message);
             }
