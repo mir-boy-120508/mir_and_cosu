@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品詳細 | 小さなパン工房ミール</title>
+    <style>
+        /* 全体のリセットと基本設定 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            color: #4a3b32;
+            background-color: #fcf9f5;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* ヘッダー */
+        header {
+            background-color: #ffffff;
+            border-bottom: 2px solid #f0e6df;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 10px;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            color: #8b5a2b;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            justify-content: center;
+        }
+
+        nav ul li {
+            margin: 0 8px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #705d53;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: color 0.3s;
+            white-space: nowrap;
+        }
+
+        nav ul li a:hover {
+            color: #d27d2d;
+        }
+
+        @media (min-width: 600px) {
+            .header-container {
+                flex-direction: row;
+                justify-content: space-between;
+                padding: 15px 20px;
+            }
+            nav ul li {
+                margin-left: 15px;
+                margin-right: 0;
+            }
+            .logo {
+                font-size: 1.5rem;
+            }
+            nav ul li a {
+                font-size: 0.95rem;
+            }
+        }
+
+        /* 詳細レイアウト */
+        .item-detail-box {
+            background-color: #ffffff;
+            border: 1px solid #eaddd5;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            margin-bottom: 30px;
+        }
+
+        .item-image-placeholder {
+            width: 100%;
+            height: 300px;
+            background-color: #f0e6df;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a67c52;
+            font-size: 4rem;
+            margin-bottom: 25px;
+        }
+
+        .item-name {
+            font-size: 1.8rem;
+            color: #8b5a2b;
+            margin-bottom: 5px;
+        }
+
+        .item-price {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #d27d2d;
+            margin-bottom: 20px;
+        }
+
+        .item-section-title {
+            font-size: 1.1rem;
+            color: #8b5a2b;
+            border-left: 4px solid #d27d2d;
+            padding-left: 10px;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .item-text {
+            font-size: 1rem;
+            color: #4a3b32;
+            padding-left: 5px;
+        }
+
+        /* アレルゲン表示マーク */
+        .allergen-list {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .allergen-item {
+            padding: 5px 15px;
+            border-radius: 6px;
+            background-color: #f0e6df;
+            color: #705d53;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* 💡 含まれないアレルゲンを薄く表示したい時用のスタイル */
+        .allergen-item.none {
+            background-color: #eaeaea;
+            color: #aaaaaa;
+            text-decoration: line-through;
+            font-weight: normal;
+        }
+
+        /* ページ移動ボタン */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        .back-btn {
+            flex: 1;
+            display: block;
+            padding: 12px;
+            text-align: center;
+            background-color: #ffffff;
+            border: 1px solid #705d53;
+            color: #705d53;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: #f0e6df;
+        }
+
+        .to-order-btn {
+            flex: 1;
+            display: block;
+            padding: 12px;
+            text-align: center;
+            background-color: #8b5a2b;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .to-order-btn:hover {
+            background-color: #705d53;
+        }
+
+        footer {
+            background-color: #4a3b32;
+            color: #fcf9f5;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.85rem;
+            margin-top: 60px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <h1 class="logo">小さなパン工房ミール</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">ホーム</a></li>
+                    <li><a href="menu.html">メニュー</a></li>
+                    <li><a href="order.html">注文</a></li>
+                    <li><a href="mypage.html">マイページ</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="item-detail-box">
+            <div class="item-image-placeholder">🥯</div>
+            
+            <h2 class="item-name">ベーグル（クランベリーとクリームチーズ）</h2>
+            <p class="item-price">¥340</p>
+
+            <div class="item-section-title">商品説明</div>
+            <p class="item-text">
+                小さなパン工房ミール看板メニューのもちもち食感のドーナツです。<br>
+                独自の配合で仕上げた生地は、冷めてもしっとりもちもちが続きます。
+            </p>
+
+            <div class="item-section-title">原材料名</div>
+            <p class="item-text">
+                小麦粉（国内製造）、砂糖、卵、バター、牛乳、イースト、塩
+            </p>
+
+            <div class="item-section-title">特定原材料（アレルゲン情報）</div>
+            <div class="allergen-list">
+                <span class="allergen-item">卵</span>
+                <span class="allergen-item">乳成分</span>
+                <span class="allergen-item">小麦</span>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="menu.html" class="back-btn">メニュー一覧に戻る</a>
+            <a href="order.html" class="to-order-btn">この商品を注文する</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 小さなパン工房ミール. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>
