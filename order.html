@@ -443,7 +443,6 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // 💡 修正：画面ロード時にFirestoreから販売日を自動取得してプルダウンに反映する処理
         document.addEventListener("DOMContentLoaded", async () => {
             const pickupDateSelect = document.getElementById('pickup-date');
             try {
@@ -544,6 +543,37 @@
                     return;
                 }
 
+                // 💡 工房受取の場合、裏側で在庫が足りているか最終チェック＆引き算をする
+                let salesDayRef = null;
+                if (window.currentOrderType === 'kobo') {
+                    const date = document.getElementById('pickup-date').value;
+                    if (!date) { alert("受取希望日を選択してください。"); return; }
+                    
+                    salesDayRef = db.collection("sales_days").doc(date);
+                    
+                    // トランザクション処理で在庫を安全に減らす
+                    await db.runTransaction(async (transaction) => {
+                        const sfDoc = await transaction.get(salesDayRef);
+                        if (!sfDoc.exists) {
+                            throw new Error("選択された販売日のデータが存在しません。");
+                        }
+
+                        const currentStock = sfDoc.data().stock || {};
+                        const newStock = { ...currentStock };
+
+                        for (const [name, qty] of Object.entries(items)) {
+                            const available = currentStock[name] || 0;
+                            if (available < qty) {
+                                throw new Error(`申し訳ありません。\n「${name}」の残り在庫（現在残り ${available} 個）が不足しているため、注文を確定できませんでした。`);
+                            }
+                            newStock[name] = available - qty;
+                        }
+
+                        transaction.update(salesDayRef, { stock: newStock });
+                    });
+                }
+
+                // 在庫引き算の成功後に注文データを作成
                 const now = new Date();
                 const expireAt = new Date(now.getTime() + 60 * 60 * 1000); // 1時間後
 
@@ -559,11 +589,8 @@
                 };
 
                 if (window.currentOrderType === 'kobo') {
-                    const date = document.getElementById('pickup-date').value;
-                    const time = document.getElementById('pickup-time').value;
-                    if (!date) { alert("受取希望日を選択してください。"); return; }
-                    orderData.pickupDate = date;
-                    orderData.pickupTime = time;
+                    orderData.pickupDate = document.getElementById('pickup-date').value;
+                    orderData.pickupTime = document.getElementById('pickup-time').value;
                 } else {
                     const range = document.getElementById('shipping-range').value;
                     const address = document.getElementById('address').value;
@@ -580,7 +607,7 @@
                 // ① Firebase Firestoreに注文を保存
                 const docRef = await db.collection("orders").add(orderData);
                 
-                // ② Cloudflare Workersにお母様・お客様両方のデータ通知用に拡張して送信
+                // ② Cloudflare Workersにデータを送信
                 const workersUrl = "https://mir-order-api.mir-boy-20120508.workers.dev/"; 
 
                 try {
@@ -595,7 +622,6 @@
                             totalPrice: totalPrice,
                             items: items,
                             orderType: window.currentOrderType,
-                            // お母様への通知用に情報を追加
                             pickupDate: orderData.pickupDate || null,
                             pickupTime: orderData.pickupTime || null,
                             shippingRange: orderData.shippingRange || null,
@@ -612,11 +638,10 @@
                     console.error("Workersへの通信に失敗しました:", err);
                 }
 
-                // 案内用の専用ページへリダイレクト
                 window.location.href = 'order-pending.html';
 
             } catch (error) {
-                alert("❌ エラーが発生しました:\n" + error.message);
+                alert("❌ " + error.message);
             }
         }
     </script>
