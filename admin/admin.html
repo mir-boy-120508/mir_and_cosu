@@ -52,13 +52,18 @@
             font-size: 1.1rem;
         }
 
-        input[type="date"] {
+        select, input[type="date"] {
             width: 100%;
             padding: 12px;
             font-size: 1.2rem;
             border: 2px solid #c2b2a6;
             border-radius: 6px;
             color: #4a3b32;
+            background-color: white;
+        }
+
+        select {
+            cursor: pointer;
         }
 
         .product-list {
@@ -138,17 +143,24 @@
         <h2>🍞 販売日とパンの数を決める画面</h2>
 
         <div class="form-section">
-            <label for="sale-date">① 次の販売日はいつですか？</label>
+            <label for="sale-type">① 販売方法を選んでください</label>
+            <select id="sale-type">
+                <option value="store">🏠 工房販売</option>
+                <option value="delivery">📦 冷凍発送</option>
+            </select>
+        </div>
+
+        <div class="form-section">
+            <label for="sale-date">② 次の販売日・発送日はいつですか？</label>
             <input type="date" id="sale-date">
         </div>
 
         <div class="form-section">
-            <label>② 各パンの種類と、その日に焼く数を決めてください</label>
-            <div class="product-list" id="product-container">
-                </div>
+            <label>③ 各パンの種類と、その日に用意する数を決めてください</label>
+            <div class="product-list" id="product-container"></div>
         </div>
 
-        <button type="button" class="submit-btn" onclick="saveSalesDay()">この内容で販売日を追加する</button>
+        <button type="button" class="submit-btn" onclick="saveSalesDay()">この内容で追加する</button>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -171,7 +183,7 @@
         }
         const db = firebase.firestore();
 
-        // 登録されているパンの一覧（order.htmlと完全一致させています）
+        // 登録されているパンの一覧
         const products = [
             "ドーナツ（プレーン）", "ココアドーナツ", "あんドーナツ",
             "ベーグル（プレーン）", "ベーグル（チョコチップ）", "ベーグル（チョコとくるみ）",
@@ -201,7 +213,7 @@
             container.appendChild(item);
         });
 
-        // 数量のプラスマイナス処理（お母様が押しやすいように5個単位で増減）
+        // 数量のプラスマイナス処理（5個単位で増減）
         window.changeCount = function(index, amount) {
             const input = document.getElementById(`count-${index}`);
             let val = parseInt(input.value) + amount;
@@ -211,7 +223,9 @@
 
         // Firestoreに保存する処理
         window.saveSalesDay = async function() {
+            const typeVal = document.getElementById('sale-type').value; // store または delivery
             const dateVal = document.getElementById('sale-date').value;
+            
             if (!dateVal) {
                 alert("❌ 日付が選ばれていません。カレンダーから選んでください。");
                 return;
@@ -223,16 +237,20 @@
                 stockData[name] = count;
             });
 
+            // アラート表示用テキストの切り替え
+            const typeText = typeVal === "store" ? "工房販売日" : "冷凍発送日";
+
             try {
-                // 日付をドキュメントIDにして保存（重複防止のため）
+                // 日付をドキュメントIDにして保存
                 await db.collection("sales_days").doc(dateVal).set({
                     date: dateVal,
+                    type: typeVal, // 追加項目: store / delivery
                     stock: stockData,
                     status: "open", // open = 注文受付中
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                alert(`🎉 【${dateVal}】の販売日と個数を登録しました！`);
+                alert(`🎉 【${dateVal}】の${typeText}と個数を登録しました！`);
                 
                 // 次の入力のために日付をリセット
                 document.getElementById('sale-date').value = "";
