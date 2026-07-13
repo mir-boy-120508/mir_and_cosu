@@ -227,7 +227,7 @@
         }
 
         .hidden {
-            display: none !important; /* スクリプトでの切り替えを優先させるため !important を付与 */
+            display: none !important;
         }
 
         footer {
@@ -265,13 +265,14 @@
         </div>
 
         <section class="order-form-section">
+            <div class="form-group">
+                <label id="date-label" for="pickup-date">受取希望日</label>
+                <select id="pickup-date" onchange="handleDateChange()">
+                    <option value="">販売日を読み込み中...</option>
+                </select>
+            </div>
+
             <div id="form-kobo">
-                <div class="form-group">
-                    <label for="pickup-date">受取希望日</label>
-                    <select id="pickup-date" onchange="handleDateChange()">
-                        <option value="">販売日を読み込み中...</option>
-                    </select>
-                </div>
                 <div class="form-group">
                     <label for="pickup-time">受取希望時間</label>
                     <select id="pickup-time">
@@ -283,13 +284,6 @@
             </div>
 
             <div id="form-reito" class="hidden">
-                <div class="form-group">
-                    <label for="shipping-range">発送予定時期</label>
-                    <select id="shipping-range">
-                        <option value="next-week">来週中に発送 (順次)</option>
-                        <option value="end-month">今月末に発送 (順次)</option>
-                    </select>
-                </div>
                 <div class="form-group">
                     <label for="address">お届け先住所</label>
                     <input type="text" id="address" placeholder="〇〇県〇〇市... 〇〇マンション101">
@@ -476,8 +470,13 @@
         const db = firebase.firestore();
 
         let salesDaysData = {};
+        window.currentOrderType = 'kobo';
 
         document.addEventListener("DOMContentLoaded", async () => {
+            await loadSalesDays();
+        });
+
+        async function loadSalesDays() {
             const pickupDateSelect = document.getElementById('pickup-date');
             try {
                 const snapshot = await db.collection("sales_days")
@@ -491,7 +490,7 @@
                 if (snapshot.empty) {
                     const option = document.createElement('option');
                     option.value = '';
-                    option.innerText = '現在、ご予約可能な販売日はありません';
+                    option.innerText = '現在、ご予約可能な日程はありません';
                     pickupDateSelect.appendChild(option);
                     updateQuantityDropdowns(0);
                     return;
@@ -520,21 +519,21 @@
 
             } catch (error) {
                 console.error("販売日の取得に失敗しました:", error);
-                pickupDateSelect.innerHTML = '<option value="">販売日の読み込みに失敗しました</option>';
-            }
-        });
-
-        window.handleDateChange = function() {
-            const selectedDate = document.getElementById('pickup-date').value;
-            if (window.currentOrderType === 'kobo' && selectedDate) {
-                const stockData = salesDaysData[selectedDate] || {};
-                updateQuantityDropdowns(stockData, 'kobo');
-            } else {
-                updateQuantityDropdowns(0, 'kobo');
+                pickupDateSelect.innerHTML = '<option value="">日程の読み込みに失敗しました</option>';
             }
         }
 
-        function updateQuantityDropdowns(stockSource, type) {
+        window.handleDateChange = function() {
+            const selectedDate = document.getElementById('pickup-date').value;
+            if (selectedDate) {
+                const stockData = salesDaysData[selectedDate] || {};
+                updateQuantityDropdowns(stockData);
+            } else {
+                updateQuantityDropdowns(0);
+            }
+        }
+
+        function updateQuantityDropdowns(stockSource) {
             const selects = document.querySelectorAll('.quantity-select select');
             
             selects.forEach(select => {
@@ -543,14 +542,10 @@
                 const currentVal = select.value;
 
                 let maxQty = 0;
-                if (type === 'reito') {
-                    maxQty = 10;
-                    if (noticeEl) noticeEl.innerText = "";
-                } else {
-                    maxQty = (stockSource && stockSource[productName] !== undefined) ? stockSource[productName] : 0;
-                    if (noticeEl) {
-                        noticeEl.innerText = stockSource ? `残り: ${maxQty}個` : "";
-                    }
+                maxQty = (stockSource && stockSource[productName] !== undefined) ? stockSource[productName] : 0;
+                
+                if (noticeEl) {
+                    noticeEl.innerText = stockSource ? `残り: ${maxQty}個` : "";
                 }
 
                 select.innerHTML = '';
@@ -569,7 +564,6 @@
             });
         }
 
-        // 💡 配送タイプによって商品の表示/非表示を切り替える処理
         function filterProducts(type) {
             const menuCards = document.querySelectorAll('.menu-grid .menu-card');
             
@@ -580,22 +574,18 @@
                 const name = h3.innerText;
                 
                 if (type === 'reito') {
-                    // 冷凍発送時の条件：ドーナツ類、またはウインナーを除くベーグルのみ許可
                     const isDonut = name.includes('ドーナツ');
                     const isBagel = name.includes('ベーグル');
                     const isWienner = name.includes('ウインナー');
                     
                     if (isDonut || (isBagel && !isWienner)) {
-                        // 対象商品は表示、選択されていた数量はそのまま
                         card.classList.remove('hidden');
                     } else {
-                        // 対象外の商品は非表示にし、数量を強制的に「0」に戻す（誤注文を完全に防ぐ）
                         card.classList.add('hidden');
                         const select = card.querySelector('.quantity-select select');
                         if (select) select.value = "0";
                     }
                 } else {
-                    // 工房受取時はすべての商品を表示
                     card.classList.remove('hidden');
                 }
             });
@@ -606,27 +596,31 @@
             const btnReito = document.getElementById('btn-reito');
             const formKobo = document.getElementById('form-kobo');
             const formReito = document.getElementById('form-reito');
+            const dateLabel = document.getElementById('date-label');
+            const pickupDateSelect = document.getElementById('pickup-date');
+
+            // 日付の選択をクリアしてドロップダウンをリセット
+            pickupDateSelect.value = "";
+            updateQuantityDropdowns(0);
 
             if (type === 'kobo') {
                 btnKobo.classList.add('active');
                 btnReito.classList.remove('active');
                 formKobo.classList.remove('hidden');
                 formReito.classList.add('hidden');
+                dateLabel.innerText = "受取希望日";
                 window.currentOrderType = 'kobo';
-                handleDateChange();
-                filterProducts('kobo'); // 全表示
+                filterProducts('kobo');
             } else {
                 btnKobo.classList.remove('active');
                 btnReito.classList.add('active');
                 formKobo.classList.add('hidden');
                 formReito.classList.remove('hidden');
+                dateLabel.innerText = "発送ベース販売日";
                 window.currentOrderType = 'reito';
-                updateQuantityDropdowns(null, 'reito');
-                filterProducts('reito'); // 冷凍限定フィルター
+                filterProducts('reito');
             }
         }
-        
-        window.currentOrderType = 'kobo';
 
         window.submitOrder = async function() {
             try {
@@ -641,12 +635,17 @@
                     return;
                 }
 
+                const date = document.getElementById('pickup-date').value;
+                if (!date) {
+                    alert(window.currentOrderType === 'kobo' ? "受取希望日を選択してください。" : "発送ベースの販売日を選択してください。");
+                    return;
+                }
+
                 const items = {};
                 let totalPrice = 0;
                 const menuCards = document.querySelectorAll('.menu-card');
                 
                 menuCards.forEach(card => {
-                    // 非表示になっている商品（冷凍対象外）のデータは送信しない
                     if (card.classList.contains('hidden')) return;
 
                     const h3 = card.querySelector('h3');
@@ -667,33 +666,27 @@
                     return;
                 }
 
-                let salesDayRef = null;
-                if (window.currentOrderType === 'kobo') {
-                    const date = document.getElementById('pickup-date').value;
-                    if (!date) { alert("受取希望日を選択してください。"); return; }
-                    
-                    salesDayRef = db.collection("sales_days").doc(date);
-                    
-                    await db.runTransaction(async (transaction) => {
-                        const sfDoc = await transaction.get(salesDayRef);
-                        if (!sfDoc.exists) {
-                            throw new Error("選択された販売日のデータが存在しません。");
+                // 共通の在庫減算処理トランザクション
+                const salesDayRef = db.collection("sales_days").doc(date);
+                await db.runTransaction(async (transaction) => {
+                    const sfDoc = await transaction.get(salesDayRef);
+                    if (!sfDoc.exists) {
+                        throw new Error("選択された日程のデータが存在しません。");
+                    }
+
+                    const currentStock = sfDoc.data().stock || {};
+                    const newStock = { ...currentStock };
+
+                    for (const [name, qty] of Object.entries(items)) {
+                        const available = currentStock[name] || 0;
+                        if (available < qty) {
+                            throw new Error(`申し訳ありません。\n「${name}」の残り在庫（現在残り ${available} 個）が不足しているため、注文を確定できませんでした。`);
                         }
+                        newStock[name] = available - qty;
+                    }
 
-                        const currentStock = sfDoc.data().stock || {};
-                        const newStock = { ...currentStock };
-
-                        for (const [name, qty] of Object.entries(items)) {
-                            const available = currentStock[name] || 0;
-                            if (available < qty) {
-                                throw new Error(`申し訳ありません。\n「${name}」の残り在庫（現在残り ${available} 個）が不足しているため、注文を確定できませんでした。`);
-                            }
-                            newStock[name] = available - qty;
-                        }
-
-                        transaction.update(salesDayRef, { stock: newStock });
-                    });
-                }
+                    transaction.update(salesDayRef, { stock: newStock });
+                });
 
                 const now = new Date();
                 const expireAt = new Date(now.getTime() + 60 * 60 * 1000);
@@ -706,17 +699,17 @@
                     totalPrice: totalPrice,
                     status: "pending", 
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    expireAt: firebase.firestore.Timestamp.fromDate(expireAt)
+                    expireAt: firebase.firestore.Timestamp.fromDate(expireAt),
+                    date: date // 選択した販売日
                 };
 
                 if (window.currentOrderType === 'kobo') {
-                    orderData.pickupDate = document.getElementById('pickup-date').value;
+                    orderData.pickupDate = date;
                     orderData.pickupTime = document.getElementById('pickup-time').value;
                 } else {
-                    const range = document.getElementById('shipping-range').value;
                     const address = document.getElementById('address').value;
                     if (!address) { alert("お届け先住所を入力してください。"); return; }
-                    orderData.shippingRange = range;
+                    orderData.shippingBaseDate = date;
                     orderData.address = address;
                 }
 
@@ -729,7 +722,7 @@
                 const workersUrl = "https://mir-order-api.mir-boy-20120508.workers.dev/"; 
 
                 try {
-                    const emailResponse = await fetch(workersUrl, {
+                    await fetch(workersUrl, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
@@ -742,16 +735,11 @@
                             orderType: window.currentOrderType,
                             pickupDate: orderData.pickupDate || null,
                             pickupTime: orderData.pickupTime || null,
-                            shippingRange: orderData.shippingRange || null,
+                            shippingBaseDate: orderData.shippingBaseDate || null,
                             address: orderData.address || null,
                             notes: orderData.notes || null
                         })
                     });
-
-                    const emailResult = await emailResponse.json();
-                    if (!emailResult.success) {
-                        console.error("メール送信APIエラー:", emailResult.error);
-                    }
                 } catch (err) {
                     console.error("Workersへの通信に失敗しました:", err);
                 }
