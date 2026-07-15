@@ -501,8 +501,19 @@
                 defaultOption.innerText = '選択してください';
                 pickupDateSelect.appendChild(defaultOption);
 
+                // 今日の日付を取得 (YYYY-MM-DD形式)
+                const todayStr = new Date().toLocaleDateString('sv-SE');
+                let hasValidDate = false;
+
                 snapshot.forEach(doc => {
                     const data = doc.data();
+
+                    // 販売日（data.date）が今日より前の場合は選択肢に追加せずスキップ
+                    if (data.date && data.date < todayStr) {
+                        return;
+                    }
+
+                    hasValidDate = true;
                     salesDaysData[data.date] = data.stock || {};
                     
                     const option = document.createElement('option');
@@ -514,6 +525,15 @@
                     option.innerText = formattedDate;
                     pickupDateSelect.appendChild(option);
                 });
+
+                // すべてのオープン日程が過去日で、表示可能な日程が1つも残らなかった場合の対応
+                if (!hasValidDate) {
+                    pickupDateSelect.innerHTML = '';
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.innerText = '現在、ご予約可能な日程はありません';
+                    pickupDateSelect.appendChild(option);
+                }
 
                 updateQuantityDropdowns(0);
 
