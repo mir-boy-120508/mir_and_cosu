@@ -48,8 +48,8 @@
                 // Firebase Auth を使ったセキュアなログイン処理
                 await auth.signInWithEmailAndPassword(email, password);
                 
-                // ログイン成功後、ダッシュボード画面等へリダイレクト
-                window.location.href = "dashboard.html"; 
+                // ログイン成功後、管理者用ホーム画面等へリダイレクト
+                window.location.href = "/admin/index"; 
             } catch (error) {
                 console.error("ログインエラー:", error);
                 alert("ログインに失敗しました。メールアドレスまたはパスワードを確認してください。");
