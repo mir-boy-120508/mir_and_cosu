@@ -11,7 +11,9 @@
             box-sizing: border-box;
         }
 
+        /* 💡 ログイン確認が取れるまで、画面全体を非表示にしておきます */
         body {
+            display: none; 
             font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
             color: #4a3b32;
             background-color: #f8f1eb;
@@ -167,7 +169,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-<script src="auth-check.js"></script>
+    <script src="auth-check.js"></script>
 
     <script>
         // Firebase初期化設定
@@ -200,20 +202,33 @@
             "米粉のベイクドチーズケーキ", "米粉のレモンパウンドケーキ"
         ];
 
-        // 画面に商品リストを描画
-        const container = document.getElementById('product-container');
-        products.forEach((name, index) => {
-            const item = document.createElement('div');
-            item.className = 'product-item';
-            item.innerHTML = `
-                <div class="product-name">${name}</div>
-                <div class="counter-group">
-                    <button type="button" class="count-btn" onclick="changeCount(${index}, -5)">-</button>
-                    <input type="number" class="count-input" id="count-${index}" value="10" min="0">
-                    <button type="button" class="count-btn" onclick="changeCount(${index}, 5)">+</button>
-                </div>
-            `;
-            container.appendChild(item);
+        // 画面に商品リストを描画する関数
+        function renderProducts() {
+            const container = document.getElementById('product-container');
+            container.innerHTML = ""; // 初期化
+            products.forEach((name, index) => {
+                const item = document.createElement('div');
+                item.className = 'product-item';
+                item.innerHTML = `
+                    <div class="product-name">${name}</div>
+                    <div class="counter-group">
+                        <button type="button" class="count-btn" onclick="changeCount(${index}, -5)">-</button>
+                        <input type="number" class="count-input" id="count-${index}" value="10" min="0">
+                        <button type="button" class="count-btn" onclick="changeCount(${index}, 5)">+</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // 💡 認証状態を監視し、認証に成功したら画面とリストを描画します
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                // 認証成功時、隠していたbody要素を表示してリストを描画
+                document.body.style.display = "block";
+                renderProducts();
+            }
+            // 未ログインの場合は auth-check.js 側で自動的に login.html にリダイレクトされます
         });
 
         // 数量のプラスマイナス処理（5個単位で増減）
