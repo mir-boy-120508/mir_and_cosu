@@ -198,8 +198,7 @@
             "米粉のベイクドチーズケーキ", "米粉のレモンパウンドケーキ"
         ];
 
-        // 💡 画面にパンのリストを生成する関数
-        // (ログイン確認が取れたら auth-check.js から呼び出されます)
+        // 画面にパンのリストを生成する関数
         window.renderProducts = function() {
             const container = document.getElementById('product-container');
             container.innerHTML = "";
@@ -226,10 +225,10 @@
             input.value = val;
         }
 
-        // 保存処理
+        // 💡 Firestoreに保存する処理の修正
         window.saveSalesDay = async function() {
-            const typeVal = document.getElementById('sale-type').value;
-            const dateVal = document.getElementById('sale-date').value;
+            const typeVal = document.getElementById('sale-type').value; // store または delivery
+            const dateVal = document.getElementById('sale-date').value; // 例: "2026-08-01"
             
             if (!dateVal) {
                 alert("❌ 日付が選ばれていません。カレンダーから選んでください。");
@@ -243,13 +242,16 @@
             });
 
             const typeText = typeVal === "store" ? "工房販売日" : "冷凍発送日";
+            
+            // 💡 修正ポイント: ドキュメントIDを「日付_販売方法」(例: 2026-08-01_store) にして個別に分離して保存
+            const docId = `${dateVal}_${typeVal}`;
 
             try {
-                await db.collection("sales_days").doc(dateVal).set({
+                await db.collection("sales_days").doc(docId).set({
                     date: dateVal,
                     type: typeVal,
                     stock: stockData,
-                    status: "open",
+                    status: "open", // open = 注文受付中
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
