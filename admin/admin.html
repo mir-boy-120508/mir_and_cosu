@@ -19,40 +19,6 @@
             padding: 20px;
         }
 
-        /* 💡 ログイン確認中に表示する重ね合わせロード画面 */
-        #auth-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #f8f1eb;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #8b5a2b;
-        }
-
-        /* 読み込み中のぐるぐるアニメーション */
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #eaddd5;
-            border-top: 5px solid #8b5a2b;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
         .container {
             max-width: 700px;
             margin: 0 auto;
@@ -173,11 +139,6 @@
 </head>
 <body>
 
-    <div id="auth-overlay">
-        <div class="spinner"></div>
-        <div>管理者認証を確認しています...</div>
-    </div>
-
     <div class="container">
         <h2>🍞 販売日とパンの数を決める画面</h2>
 
@@ -207,7 +168,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // Firebase初期化設定
+        // Firebase初期化
         const firebaseConfig = {
             apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
             authDomain: "mir-and-cosu.firebaseapp.com",
@@ -237,8 +198,9 @@
             "米粉のベイクドチーズケーキ", "米粉のレモンパウンドケーキ"
         ];
 
-        // パンリスト描画
-        function renderProducts() {
+        // 💡 画面にパンのリストを生成する関数
+        // (ログイン確認が取れたら auth-check.js から呼び出されます)
+        window.renderProducts = function() {
             const container = document.getElementById('product-container');
             container.innerHTML = "";
             products.forEach((name, index) => {
@@ -255,27 +217,6 @@
                 container.appendChild(item);
             });
         }
-
-        // 💡 このファイル内で直接、ログイン状態をセキュアに確認します
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                console.log("ログイン確認完了:", user.email);
-                
-                // ① パンリストを描画する
-                renderProducts();
-                
-                // ② ログインが確認されたらロード画面（オーバーレイ）を非表示にする
-                const overlay = document.getElementById('auth-overlay');
-                if (overlay) {
-                    overlay.style.display = 'none';
-                }
-            } else {
-                console.log("未ログインのため、ログイン画面へ転送します。");
-                
-                // 💡 ログインしていない場合は、即座にログイン画面へ飛ばす
-                window.location.href = "login.html";
-            }
-        });
 
         // 数量増減
         window.changeCount = function(index, amount) {
@@ -319,5 +260,7 @@
             }
         }
     </script>
+
+    <script src="auth-check.js"></script>
 </body>
 </html>
