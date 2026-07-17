@@ -19,7 +19,7 @@
             padding: 20px;
         }
 
-        /* 💡 ログイン確認中に表示する重ね合わせ画面（ホワイトアウト防止） */
+        /* 💡 ログイン確認中に表示する重ね合わせロード画面 */
         #auth-overlay {
             position: fixed;
             top: 0;
@@ -206,10 +206,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-    <script src="auth-check.js"></script>
-
     <script>
-        // Firebase初期化
+        // Firebase初期化設定
         const firebaseConfig = {
             apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
             authDomain: "mir-and-cosu.firebaseapp.com",
@@ -258,19 +256,25 @@
             });
         }
 
-        // 💡 ログイン状態の監視
+        // 💡 このファイル内で直接、ログイン状態をセキュアに確認します
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                // ログイン成功時：パンのリストを描画
+                console.log("ログイン確認完了:", user.email);
+                
+                // ① パンリストを描画する
                 renderProducts();
                 
-                // 💡 ロード用の画面をフェードアウト、もしくは非表示にする
+                // ② ログインが確認されたらロード画面（オーバーレイ）を非表示にする
                 const overlay = document.getElementById('auth-overlay');
                 if (overlay) {
                     overlay.style.display = 'none';
                 }
+            } else {
+                console.log("未ログインのため、ログイン画面へ転送します。");
+                
+                // 💡 ログインしていない場合は、即座にログイン画面へ飛ばす
+                window.location.href = "login.html";
             }
-            // 未ログインの場合は auth-check.js によって自動で login.html にリダイレクトされます
         });
 
         // 数量増減
