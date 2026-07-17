@@ -176,14 +176,12 @@
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-    <script src="auth-check.js"></script>
-
     <script>
-        // Firebase初期化設定
+        // 2. 最優先でFirebaseを初期化する
         const firebaseConfig = {
             apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
             authDomain: "mir-and-cosu.firebaseapp.com",
@@ -196,14 +194,16 @@
 
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+    </script>
 
-        // ★ 変更点：ログイン状態が確定してからデータを読み込むように変更
+    <script src="auth-check.js"></script>
+
+    <script>
+        // 4. ログイン監視とデータ取得を実行する
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                // ログインが確認できたらデータをロード
                 loadOrders();
             } else {
-                // まだログインが確認できていない（または未ログインの）とき
                 document.getElementById("order-list").innerHTML = 
                     `<tr><td colspan="4" style="text-align: center; padding: 30px; color: gray;">ログインを確認中...</td></tr>`;
             }
@@ -213,7 +213,6 @@
         async function loadOrders() {
             const orderListEl = document.getElementById("order-list");
             try {
-                // 注文データを受取日の近い順に取得
                 const snapshot = await db.collection("orders").orderBy("pickupDate", "asc").get();
                 orderListEl.innerHTML = "";
 
@@ -225,27 +224,21 @@
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     
-                    // 仮受付（"temporary"など、orderedとcompleted以外）のデータはダッシュボードに乗せない
                     if (data.status !== "ordered" && data.status !== "completed") {
                         return; 
                     }
 
                     displayCount++;
 
-                    // 統計用のカウント（確定かつ未受取のものをカウント）
                     if (data.status === "ordered") pendingCount++;
                     if (data.status === "ordered" && data.pickupDate === todayStr) todayCount++;
 
-                    // 💡 注文商品の解析処理
                     let itemsText = "";
-                    
                     if (data.items) {
                         if (Array.isArray(data.items)) {
-                            // パターンA: 配列リスト形式の場合 [{name: "あんドーナツ", quantity: 3}]
                             const activeItems = data.items.filter(item => item.quantity > 0);
                             itemsText = activeItems.map(item => `・${item.name} × ${item.quantity}個`).join("\n");
                         } else if (typeof data.items === 'object') {
-                            // パターンB: マップ形式の場合 {"あんドーナツ": 3, "ホテルブレッド": 1}
                             const itemList = [];
                             for (const [name, qty] of Object.entries(data.items)) {
                                 if (qty > 0) {
@@ -256,16 +249,13 @@
                         }
                     }
                     
-                    // もし上記どちらでも取れず、テキスト概要が入っていればそれを使う
                     if (!itemsText && data.itemsSummary) {
                         itemsText = data.itemsSummary;
                     }
-                    // 万が一何もデータがなければ
                     if (!itemsText) {
                         itemsText = "商品詳細なし";
                     }
 
-                    // ステータスバッジの調整
                     const statusClass = (data.status === "completed") ? "status completed" : "status pending";
                     const statusText = (data.status === "completed") ? "受取済" : "未受取";
 
@@ -279,7 +269,6 @@
                     orderListEl.appendChild(tr);
                 });
 
-                // 表示対象の確定注文が1件もなかった場合
                 if (displayCount === 0) {
                     orderListEl.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 30px; color: gray;">現在、確定された予約注文はありません。</td></tr>`;
                 }
