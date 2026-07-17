@@ -11,14 +11,46 @@
             box-sizing: border-box;
         }
 
-        /* 💡 ログイン確認が取れるまで、画面全体を非表示にしておきます */
         body {
-            display: none; 
             font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
             color: #4a3b32;
             background-color: #f8f1eb;
             line-height: 1.6;
             padding: 20px;
+        }
+
+        /* 💡 ログイン確認中に表示する重ね合わせ画面（ホワイトアウト防止） */
+        #auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f8f1eb;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #8b5a2b;
+        }
+
+        /* 読み込み中のぐるぐるアニメーション */
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #eaddd5;
+            border-top: 5px solid #8b5a2b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .container {
@@ -141,6 +173,11 @@
 </head>
 <body>
 
+    <div id="auth-overlay">
+        <div class="spinner"></div>
+        <div>管理者認証を確認しています...</div>
+    </div>
+
     <div class="container">
         <h2>🍞 販売日とパンの数を決める画面</h2>
 
@@ -172,7 +209,7 @@
     <script src="auth-check.js"></script>
 
     <script>
-        // Firebase初期化設定
+        // Firebase初期化
         const firebaseConfig = {
             apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
             authDomain: "mir-and-cosu.firebaseapp.com",
@@ -202,10 +239,10 @@
             "米粉のベイクドチーズケーキ", "米粉のレモンパウンドケーキ"
         ];
 
-        // 画面に商品リストを描画する関数
+        // パンリスト描画
         function renderProducts() {
             const container = document.getElementById('product-container');
-            container.innerHTML = ""; // 初期化
+            container.innerHTML = "";
             products.forEach((name, index) => {
                 const item = document.createElement('div');
                 item.className = 'product-item';
@@ -221,17 +258,22 @@
             });
         }
 
-        // 💡 認証状態を監視し、認証に成功したら画面とリストを描画します
+        // 💡 ログイン状態の監視
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                // 認証成功時、隠していたbody要素を表示してリストを描画
-                document.body.style.display = "block";
+                // ログイン成功時：パンのリストを描画
                 renderProducts();
+                
+                // 💡 ロード用の画面をフェードアウト、もしくは非表示にする
+                const overlay = document.getElementById('auth-overlay');
+                if (overlay) {
+                    overlay.style.display = 'none';
+                }
             }
-            // 未ログインの場合は auth-check.js 側で自動的に login.html にリダイレクトされます
+            // 未ログインの場合は auth-check.js によって自動で login.html にリダイレクトされます
         });
 
-        // 数量のプラスマイナス処理（5個単位で増減）
+        // 数量増減
         window.changeCount = function(index, amount) {
             const input = document.getElementById(`count-${index}`);
             let val = parseInt(input.value) + amount;
@@ -239,9 +281,9 @@
             input.value = val;
         }
 
-        // Firestoreに保存する処理
+        // 保存処理
         window.saveSalesDay = async function() {
-            const typeVal = document.getElementById('sale-type').value; // store または delivery
+            const typeVal = document.getElementById('sale-type').value;
             const dateVal = document.getElementById('sale-date').value;
             
             if (!dateVal) {
@@ -255,22 +297,18 @@
                 stockData[name] = count;
             });
 
-            // アラート表示用テキストの切り替え
             const typeText = typeVal === "store" ? "工房販売日" : "冷凍発送日";
 
             try {
-                // 日付をドキュメントIDにして保存
                 await db.collection("sales_days").doc(dateVal).set({
                     date: dateVal,
-                    type: typeVal, // 追加項目: store / delivery
+                    type: typeVal,
                     stock: stockData,
-                    status: "open", // open = 注文受付中
+                    status: "open",
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
                 alert(`🎉 【${dateVal}】の${typeText}と個数を登録しました！`);
-                
-                // 次の入力のために日付をリセット
                 document.getElementById('sale-date').value = "";
             } catch (error) {
                 alert("❌ 保存に失敗しました:\n" + error.message);
