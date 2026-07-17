@@ -180,7 +180,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-<script src="auth-check.js"></script>
+    <script src="auth-check.js"></script>
 
     <script>
         // Firebase初期化設定
@@ -197,7 +197,17 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        document.addEventListener("DOMContentLoaded", loadOrders);
+        // ★ 変更点：ログイン状態が確定してからデータを読み込むように変更
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                // ログインが確認できたらデータをロード
+                loadOrders();
+            } else {
+                // まだログインが確認できていない（または未ログインの）とき
+                document.getElementById("order-list").innerHTML = 
+                    `<tr><td colspan="4" style="text-align: center; padding: 30px; color: gray;">ログインを確認中...</td></tr>`;
+            }
+        });
 
         // Firestoreから注文データを読み込んで表示する関数
         async function loadOrders() {
@@ -226,7 +236,7 @@
                     if (data.status === "ordered") pendingCount++;
                     if (data.status === "ordered" && data.pickupDate === todayStr) todayCount++;
 
-                    // 💡 注文商品の解析処理を強力にアップデート！
+                    // 💡 注文商品の解析処理
                     let itemsText = "";
                     
                     if (data.items) {
