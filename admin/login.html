@@ -45,6 +45,9 @@
             const password = document.getElementById("password").value;
 
             try {
+                // 💡 【重要】ログインの永続性を「SESSION（現在のタブ限定）」に設定して、一般ユーザー側と分離する
+                await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+
                 // Firebase Auth を使ったセキュアなログイン処理
                 await auth.signInWithEmailAndPassword(email, password);
                 
