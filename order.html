@@ -470,17 +470,24 @@
         const db = firebase.firestore();
 
         let salesDaysData = {};
-        window.currentOrderType = 'kobo';
+        window.currentOrderType = 'kobo'; // 'kobo' または 'reito'
 
         document.addEventListener("DOMContentLoaded", async () => {
             await loadSalesDays();
         });
 
+        // 💡 修正ポイント: 現在の選択タイプ（koboかreitoか）に合わせてカレンダーの選択肢を読み込む
         async function loadSalesDays() {
             const pickupDateSelect = document.getElementById('pickup-date');
+            
+            // kobo -> store、reito -> delivery にFirestoreの検索条件を切り替え
+            const targetType = window.currentOrderType === 'kobo' ? 'store' : 'delivery';
+
             try {
+                // "type" フィールドで絞り込むようにクエリを修正
                 const snapshot = await db.collection("sales_days")
                                            .where("status", "==", "open")
+                                           .where("type", "==", targetType)
                                            .orderBy("date", "asc")
                                            .get();
                 
@@ -514,6 +521,7 @@
                     }
 
                     hasValidDate = true;
+                    // キーを「日付」にして、在庫をメモリ上に保管
                     salesDaysData[data.date] = data.stock || {};
                     
                     const option = document.createElement('option');
@@ -611,6 +619,7 @@
             });
         }
 
+        // 💡 修正ポイント: タブ切り替え時に「カレンダー」を一旦リセットして再ロードする
         window.switchType = function(type) {
             const btnKobo = document.getElementById('btn-kobo');
             const btnReito = document.getElementById('btn-reito');
@@ -619,8 +628,8 @@
             const dateLabel = document.getElementById('date-label');
             const pickupDateSelect = document.getElementById('pickup-date');
 
-            // 日付の選択をクリアしてドロップダウンをリセット
-            pickupDateSelect.value = "";
+            // 読み込み中状態にして選択肢を一旦クリア
+            pickupDateSelect.innerHTML = '<option value="">販売日を読み込み中...</option>';
             updateQuantityDropdowns(0);
 
             if (type === 'kobo') {
@@ -640,6 +649,9 @@
                 window.currentOrderType = 'reito';
                 filterProducts('reito');
             }
+
+            // 新しいタブ（販売方法）に対応する日程をFirestoreから再ロード
+            loadSalesDays();
         }
 
         window.submitOrder = async function() {
@@ -655,7 +667,7 @@
                     return;
                 }
 
-                const date = document.getElementById('pickup-date').value;
+                const date = document.getElementById('pickup-date').value; // 例: "2026-08-01"
                 if (!date) {
                     alert(window.currentOrderType === 'kobo' ? "受取希望日を選択してください。" : "発送ベースの販売日を選択してください。");
                     return;
@@ -686,8 +698,13 @@
                     return;
                 }
 
+                // 💡 修正ポイント: 注文する商品の在庫ドキュメントIDを一意に特定
+                // (例: '2026-08-01_store' または '2026-08-01_delivery')
+                const targetType = window.currentOrderType === 'kobo' ? 'store' : 'delivery';
+                const docId = `${date}_${targetType}`;
+                const salesDayRef = db.collection("sales_days").doc(docId);
+
                 // 共通の在庫減算処理トランザクション
-                const salesDayRef = db.collection("sales_days").doc(date);
                 await db.runTransaction(async (transaction) => {
                     const sfDoc = await transaction.get(salesDayRef);
                     if (!sfDoc.exists) {
