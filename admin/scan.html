@@ -41,41 +41,42 @@
 
         /* カメラが映るエリア */
         #reader {
-            width: 100% !important;
-            border: 2px solid #c2b2a6 !important;
+            width: 100%;
             border-radius: 8px;
             overflow: hidden;
-            background-color: #000;
+            border: 2px solid #eaddd5 !important;
         }
 
-        /* 読み取り結果を表示するエリア */
-        .result-section {
-            margin-top: 25px;
+        /* スキャン結果のポップアップ表示 */
+        .result-box {
+            margin-top: 20px;
             padding: 15px;
-            background-color: #fff9f5;
-            border: 2px solid #d27d2d;
+            background: #fff9f5;
+            border: 1px solid #eaddd5;
             border-radius: 8px;
-            display: none; /* 最初は非表示 */
+            display: none; /* デフォルトは非表示 */
         }
 
-        .result-section.active {
+        .result-box.active {
             display: block;
+            animation: fadeIn 0.3s ease;
         }
 
-        .order-title {
-            font-size: 1.2rem;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-title {
             font-weight: bold;
+            font-size: 1.1rem;
+            color: #8b5a2b;
             margin-bottom: 10px;
+            border-bottom: 1px solid #eaddd5;
+            padding-bottom: 5px;
         }
 
-        .order-details {
-            font-size: 0.95rem;
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-
-        /* お渡し完了ボタン */
-        .complete-btn {
+        .btn-complete {
             display: block;
             width: 100%;
             padding: 12px;
@@ -86,47 +87,51 @@
             font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
-        }
-
-        .complete-btn:hover {
-            background-color: #b66520;
-        }
-
-        .nav-link {
-            display: block;
+            margin-top: 15px;
             text-align: center;
+        }
+
+        .btn-complete:hover {
+            background-color: #8b5a2b;
+        }
+
+        .nav-links {
             margin-top: 20px;
+            text-align: center;
+        }
+        .nav-links a {
             color: #705d53;
             text-decoration: none;
             font-size: 0.9rem;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
     <div class="admin-container">
-        <h1>ミール・受取スキャナー</h1>
+        <h1>📸 受取QRコードスキャナー</h1>
         
         <div id="reader"></div>
 
-        <div id="scan-result" class="result-section">
-            <div class="order-title" id="scan-title">注文照合成功！</div>
-            <p style="font-size: 0.85rem; color:#d27d2d; margin-bottom:10px;">ID: <span id="res-order-id"></span></p>
-            
-            <div class="order-details" id="res-order-details">
+        <div id="scan-result" class="result-box">
+            <div id="result-title" class="result-title">🔍 読込中...</div>
+            <div id="result-details">
                 </div>
-
-            <button type="button" class="complete-btn" id="btn-complete" onclick="completePickup()">商品を渡して完了にする</button>
+            <button id="btn-complete" class="btn-complete" onclick="completePickup()">🎁 お渡し完了にする</button>
         </div>
 
-        <a href="/admin" class="nav-link">⬅ ホームへ戻る</a>
+        <div class="nav-links">
+            <a href="/admin/index">⬅ 管理メニューに戻る</a>
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // Firebase初期化設定
+        // 1. 最優先でFirebaseを初期化する
         const firebaseConfig = {
             apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
             authDomain: "mir-and-cosu.firebaseapp.com",
@@ -141,84 +146,99 @@
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.firestore();
+    </script>
 
-        // 現在スキャン中の注文IDを保持する変数
-        let currentScanOrderId = null;
+    <script src="auth-check.js"></script>
 
-        // スキャナーの設定
-        const config = {
-            fps: 15,
-            qrbox: 250,
-            videoConstraints: {
-                facingMode: "environment" // 背面カメラを優先
+    <script>
+        let currentScanOrderId = null; // 現在スキャンして表示している注文ID
+        let html5QrcodeScanner = null;
+
+        // 3. ログイン状態の確定を待ってから、カメラ（スキャナー）を起動する
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                // ログインが確認できたらスキャナーをセットアップ
+                initScanner();
+            } else {
+                console.log("ログイン確認中...");
             }
-        };
+        });
 
-        // スキャナーの初期化と起動
-        let html5QrcodeScanner = new Html5QrcodeScanner("reader", config, /* verbose= */ false);
-        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        function initScanner() {
+            // スキャナーの初期化
+            html5QrcodeScanner = new Html5QrcodeScanner(
+                "reader", 
+                { 
+                    fps: 10,       // 1秒間に何回スキャンを試みるか
+                    qrbox: { width: 250, height: 250 }, // スキャン窓のサイズ
+                    rememberLastUsedCamera: true // 前回使ったカメラを記憶
+                }
+            );
+            html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        }
 
-        // スキャン成功時の処理
+        // スキャン成功時
         async function onScanSuccess(decodedText, decodedResult) {
-            // 連続で同じ読み取り処理が走らないようにIDをチェック
+            console.log(`スキャン成功: ${decodedText}`);
+            
+            // 連続で何度も同じものをスキャンしてバグるのを防ぐ
             if (currentScanOrderId === decodedText) return;
             
-            currentScanOrderId = decodedText;
-            document.getElementById("res-order-id").innerText = decodedText;
-            
-            const detailsEl = document.getElementById("res-order-details");
-            const resultSection = document.getElementById("scan-result");
-            const titleEl = document.getElementById("scan-title");
+            currentScanOrderId = decodedText; // ドキュメントIDをセット
+
+            // 結果エリアを表示状態にする
+            const resultBox = document.getElementById("scan-result");
+            const titleEl = document.getElementById("result-title");
+            const detailsEl = document.getElementById("result-details");
             const completeBtn = document.getElementById("btn-complete");
 
-            detailsEl.innerHTML = "<p>データを照合中...</p>";
-            resultSection.classList.add("active");
+            resultBox.classList.add("active");
+            titleEl.innerText = "🔍 データを照合中...";
+            detailsEl.innerHTML = "<p>お待ちください...</p>";
+            completeBtn.style.display = "none";
 
             try {
-                // Firestoreから該当の注文データを取得
-                const docRef = db.collection("orders").doc(decodedText);
-                const docSnap = await docRef.get();
+                // Firestoreから注文データを検索
+                const doc = await db.collection("orders").doc(currentScanOrderId).get();
 
-                if (!docSnap.exists) {
-                    titleEl.innerText = "❌ 注文が見つかりません";
-                    detailsEl.innerHTML = "<p style='color:red;'>該当する注文IDがデータベースに存在しません。</p>";
-                    completeBtn.style.display = "none";
+                if (!doc.exists) {
+                    titleEl.innerText = "❌ 未登録のコード";
+                    detailsEl.innerHTML = "<p style='color:red;'>注文データが見つかりませんでした。</p>";
                     return;
                 }
 
-                const order = docSnap.data();
+                const order = doc.data();
 
-                // すでに完了しているかどうかの確認
+                // 既に受取完了している場合
                 if (order.status === "completed") {
-                    titleEl.innerText = "⚠️ お渡し済みです";
+                    titleEl.innerText = "✅ 受取済みの注文です";
                     completeBtn.style.display = "none";
                 } else {
-                    titleEl.innerText = "注文照合成功！";
+                    titleEl.innerText = "📋 注文が確認できました！";
                     completeBtn.style.display = "block";
                 }
 
-                // 注文内容（パン一覧）のHTMLを組み立てる
-                let itemsHtml = "";
-                for (const [name, qty] of Object.entries(order.items || {})) {
-                    itemsHtml += `<p>🥖 ${name} × ${qty}</p>`;
+                // 注文商品テキストの組み立て
+                let itemsText = "";
+                if (order.items) {
+                    if (Array.isArray(order.items)) {
+                        const activeItems = order.items.filter(item => item.quantity > 0);
+                        itemsText = activeItems.map(item => `・${item.name} × ${item.quantity}個`).join("<br>");
+                    } else if (typeof order.items === 'object') {
+                        const itemList = [];
+                        for (const [name, qty] of Object.entries(order.items)) {
+                            if (qty > 0) itemList.push(`・${name} × ${qty}個`);
+                        }
+                        itemsText = itemList.join("<br>");
+                    }
                 }
+                if (!itemsText && order.itemsSummary) itemsText = order.itemsSummary.replace(/\n/g, "<br>");
+                if (!itemsText) itemsText = "商品詳細なし";
 
-                // 日付のフォーマット変換
-                let dateText = "";
-                if (order.orderType === "kobo") {
-                    dateText = `<strong>受取時間：</strong> ${order.pickupDate} (${order.pickupTime})`;
-                } else {
-                    dateText = `<strong>配送予定：</strong> 冷凍発送 (${order.shippingRange})`;
-                }
-
-                // 画面を書き換え
                 detailsEl.innerHTML = `
-                    <p><strong>お客様メール：</strong> ${order.email}</p>
-                    <p>${dateText}</p>
-                    <hr style="margin: 10px 0; border: 0; border-top: 1px solid #eaddd5;">
-                    ${itemsHtml}
-                    <hr style="margin: 10px 0; border: 0; border-top: 1px solid #eaddd5;">
-                    <p style="font-size: 1.1rem; color: #8b5a2b;"><strong>合計金額：¥${order.totalPrice.toLocaleString()}（現地払い）</strong></p>
+                    <p style="margin-bottom: 5px;">受取日: <strong>${order.pickupDate || "-"}</strong></p>
+                    <p style="margin-bottom: 10px; color:#555;">注文内容:<br><strong style="color:#222; font-size:1.05rem; line-height:1.4;">${itemsText}</strong></p>
+                    <p style="margin-bottom: 5px;">お支払い金額: <strong style="color:#d27d2d; font-size:1.2rem;">¥${(order.totalPrice || 0).toLocaleString()}</strong></p>
                     ${order.notes ? `<p style="font-size:0.85rem; color:#666; background:#eee; padding:5px; margin-top:10px; border-radius:4px;">備考: ${order.notes}</p>` : ""}
                 `;
 
@@ -230,9 +250,9 @@
             }
         }
 
-        // スキャン失敗時（毎フレーム読み取れなかったときも通るのでログ出力のみ）
+        // スキャン失敗時
         function onScanFailure(error) {
-            // 特になにもしない（画面がごちゃつくのを防ぐため）
+            // 特になにもしない
         }
 
         // 「お渡し完了」ボタンを押したとき
