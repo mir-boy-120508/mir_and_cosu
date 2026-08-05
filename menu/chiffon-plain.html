@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="logo.jpg">
     <title>商品詳細 | 小さなパン工房ミール</title>
     <style>
         /* 全体のリセットと基本設定 */
@@ -102,17 +103,28 @@
             margin-bottom: 30px;
         }
 
-        .item-image-placeholder {
+        /* 💡 画像を綺麗に大きく見せる枠設定（統一スタイル） */
+        .item-image-container {
             width: 100%;
-            height: 300px;
+            height: 350px;
             background-color: #f0e6df;
             border-radius: 8px;
+            margin-bottom: 25px;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .item-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-image-placeholder {
             color: #a67c52;
             font-size: 4rem;
-            margin-bottom: 25px;
         }
 
         .item-name {
@@ -159,14 +171,6 @@
             color: #705d53;
             font-weight: bold;
             font-size: 0.9rem;
-        }
-
-        /* 💡 含まれないアレルゲンを薄く表示したい時用のスタイル */
-        .allergen-item.none {
-            background-color: #eaeaea;
-            color: #aaaaaa;
-            text-decoration: line-through;
-            font-weight: normal;
         }
 
         /* ページ移動ボタン */
@@ -230,7 +234,7 @@
                 <ul>
                     <li><a href="/index">ホーム</a></li>
                     <li><a href="/menu">メニュー</a></li>
-                    <li><a href="/orderl">注文</a></li>
+                    <li><a href="/order">注文</a></li>
                     <li><a href="/mypage">マイページ</a></li>
                 </ul>
             </nav>
@@ -239,15 +243,19 @@
 
     <main class="container">
         <div class="item-detail-box">
-            <div class="item-image-placeholder">🍰</div>
+            
+            <div class="item-image-container">
+                <img src="/images/chiffon-plain.jpg" alt="米粉のシフォンケーキ（プレーン）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="item-image-placeholder" style="display:none;">🍰</div>
+            </div>
             
             <h2 class="item-name">米粉のシフォンケーキ（プレーン）</h2>
             <p class="item-price">¥250</p>
 
             <div class="item-section-title">商品説明</div>
             <p class="item-text">
-                小さなパン工房ミール看板メニューのもちもち食感のドーナツです。<br>
-                独自の配合で仕上げた生地は、冷めてもしっとりもちもちが続きます。
+                九州産米粉100%と新鮮な卵を使用し、ひとつひとつ丁寧に焼き上げた定番のシフォンケーキです。<br>
+                米粉ならではのしっとり・シュワッとした極上のくちどけと、お米と卵のやさしい自然な甘みが広がります。シンプルだからこそ素材の良さが際立つ、お子様からご年配の方まで大人気の一品です。
             </p>
 
             <div class="item-section-title">特定原材料（アレルゲン情報）</div>
