@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="logo.jpg">
     <title>商品詳細 | 小さなパン工房ミール</title>
     <style>
         /* 全体のリセットと基本設定 */
@@ -102,17 +103,28 @@
             margin-bottom: 30px;
         }
 
-        .item-image-placeholder {
+        /* 💡 画像を綺麗に大きく見せる枠設定（統一スタイル） */
+        .item-image-container {
             width: 100%;
-            height: 300px;
+            height: 350px;
             background-color: #f0e6df;
             border-radius: 8px;
+            margin-bottom: 25px;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .item-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-image-placeholder {
             color: #a67c52;
             font-size: 4rem;
-            margin-bottom: 25px;
         }
 
         .item-name {
@@ -159,14 +171,6 @@
             color: #705d53;
             font-weight: bold;
             font-size: 0.9rem;
-        }
-
-        /* 💡 含まれないアレルゲンを薄く表示したい時用のスタイル */
-        .allergen-item.none {
-            background-color: #eaeaea;
-            color: #aaaaaa;
-            text-decoration: line-through;
-            font-weight: normal;
         }
 
         /* ページ移動ボタン */
@@ -239,17 +243,21 @@
 
     <main class="container">
         <div class="item-detail-box">
-            <div class="item-image-placeholder">🍩</div>
+            
+            <div class="item-image-container">
+                <img src="/images/donuts-plain.jpg" alt="ドーナツ（プレーン）" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="item-image-placeholder" style="display:none;">🍩</div>
+            </div>
             
             <h2 class="item-name">ドーナツ</h2>
             <p class="item-price">¥270</p>
 
             <div class="item-section-title">商品説明</div>
             <p class="item-text">
-                小さなパン工房ミール看板メニューのもちもち食感のドーナツです。<br>
-                独自の配合で仕上げた生地は、冷めてもしっとりもちもちが続きます。
+                小さなパン工房ミールの看板メニュー、自慢のもちもちドーナツです。<br>
+                独自の配合で仕上げた生地は、ひとつひとつ丁寧に揚げ上げることで外はさっくり、中は驚くほどしっとりモチモチ。冷めてもおいしさが長持ちする、どこか懐かしくやさしい甘みのプレーンタイプです。
+                佐藤がまんべんなくかかっています。夏には冷やしドーナツもどうぞ。
             </p>
-
 
             <div class="item-section-title">特定原材料（アレルゲン情報）</div>
             <div class="allergen-list">
