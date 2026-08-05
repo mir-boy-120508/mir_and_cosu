@@ -111,7 +111,7 @@
         .status.pending { background-color: #ffeacc; color: #b26a00; } /* 未受取 (確定済み) */
         .status.completed { background-color: #d1e7dd; color: #0f5132; } /* 受取済 */
 
-        /* 💡 注文内容が一番大事なので、文字を少し大きめに、読みやすく */
+        /* 注文内容 */
         .order-items {
             font-size: 1rem;
             color: #2b1f17;
@@ -146,8 +146,8 @@
                 <div class="num" id="count-pending">- 件</div>
             </div>
             <div class="stat-card">
-                <p>本日の受取予定（確定分）</p>
-                <div class="num" id="count-today">- 件</div>
+                <p>本日・翌日の受取予定（確定分）</p>
+                <div class="num" id="count-upcoming">- 件</div>
             </div>
         </div>
 
@@ -176,12 +176,12 @@
         </div>
     </div>
 
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // 2. 最優先でFirebaseを初期化する
+        // 最優先でFirebaseを初期化する
         const firebaseConfig = {
             apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
             authDomain: "mir-and-cosu.firebaseapp.com",
@@ -199,7 +199,7 @@
     <script src="auth-check.js"></script>
 
     <script>
-        // 4. ログイン監視とデータ取得を実行する
+        // ログイン監視とデータ取得を実行する
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 loadOrders();
@@ -216,9 +216,16 @@
                 const snapshot = await db.collection("orders").orderBy("pickupDate", "asc").get();
                 orderListEl.innerHTML = "";
 
-                const todayStr = new Date().toISOString().split('T')[0];
+                // 本日と翌日の日付文字列（YYYY-MM-DD）を取得
+                const now = new Date();
+                const todayStr = now.toISOString().split('T')[0];
+                
+                const tomorrow = new Date(now);
+                tomorrow.setDate(now.getDate() + 1);
+                const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
                 let pendingCount = 0;
-                let todayCount = 0;
+                let upcomingCount = 0; // 本日・翌日合計
                 let displayCount = 0;
 
                 snapshot.forEach(doc => {
@@ -230,8 +237,13 @@
 
                     displayCount++;
 
-                    if (data.status === "ordered") pendingCount++;
-                    if (data.status === "ordered" && data.pickupDate === todayStr) todayCount++;
+                    if (data.status === "ordered") {
+                        pendingCount++;
+                        // 本日または翌日の受取予定の場合にカウント
+                        if (data.pickupDate === todayStr || data.pickupDate === tomorrowStr) {
+                            upcomingCount++;
+                        }
+                    }
 
                     let itemsText = "";
                     if (data.items) {
@@ -273,7 +285,7 @@
                     orderListEl.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 30px; color: gray;">現在、確定された予約注文はありません。</td></tr>`;
                 }
 
-                updateStats(pendingCount, todayCount);
+                updateStats(pendingCount, upcomingCount);
 
             } catch (error) {
                 console.error("注文データの取得に失敗しました:", error);
@@ -281,9 +293,9 @@
             }
         }
 
-        function updateStats(pending, today) {
+        function updateStats(pending, upcoming) {
             document.getElementById("count-pending").innerText = pending + " 件";
-            document.getElementById("count-today").innerText = today + " 件";
+            document.getElementById("count-upcoming").innerText = upcoming + " 件";
         }
     </script>
 </body>
