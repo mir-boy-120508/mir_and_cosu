@@ -72,93 +72,95 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
+<script>
+    // 1. 最優先でFirebaseを初期化（準備）する
+    const firebaseConfig = {
+        apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
+        authDomain: "mir-and-cosu.firebaseapp.com",
+        projectId: "mir-and-cosu",
+        storageBucket: "mir-and-cosu.firebasestorage.app",
+        messagingSenderId: "597556523101",
+        appId: "1:597556523101:web:338d402cd97dbf23c15db4",
+        measurementId: "G-294PKSL137"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+</script>
+
 <script src="auth-check.js"></script>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
-            authDomain: "mir-and-cosu.firebaseapp.com",
-            projectId: "mir-and-cosu",
-            storageBucket: "mir-and-cosu.firebasestorage.app",
-            messagingSenderId: "597556523101",
-            appId: "1:597556523101:web:338d402cd97dbf23c15db4",
-            measurementId: "G-294PKSL137"
+<script>
+    document.addEventListener("DOMContentLoaded", loadMarcheSchedule);
+
+    // スケジュール一覧の取得
+    async function loadMarcheSchedule() {
+        const listEl = document.getElementById("marche-schedule-list");
+        try {
+            const snapshot = await db.collection("marche_info").orderBy("date", "asc").get();
+            listEl.innerHTML = "";
+
+            if (snapshot.empty) {
+                listEl.innerHTML = "<li>登録されたスケジュールはありません。</li>";
+                return;
+            }
+
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const isPast = data.date < todayStr;
+                const li = document.createElement("li");
+                li.className = "marche-item";
+                li.innerHTML = `
+                    <div>
+                        <strong>${data.date}</strong>: ${data.name} ${isPast ? '<span style="color:gray;">(終了)</span>' : ''}
+                    </div>
+                    <button class="delete-btn" onclick="deleteMarche('${doc.id}')">削除</button>
+                `;
+                listEl.appendChild(li);
+            });
+        } catch (error) {
+            console.error(error);
+            listEl.innerHTML = "<li>データの取得に失敗しました。</li>";
+        }
+    }
+
+    // データの登録
+    async function saveMarcheInfo(event) {
+        event.preventDefault();
+        const dateId = document.getElementById("marche-date").value; // YYYY-MM-DD
+
+        const marcheData = {
+            date: dateId,
+            name: document.getElementById("marche-name").value,
+            datetime: document.getElementById("marche-datetime").value,
+            location: document.getElementById("marche-location").value,
+            description: document.getElementById("marche-description").value,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
         };
 
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        document.addEventListener("DOMContentLoaded", loadMarcheSchedule);
-
-        // スケジュール一覧の取得（未来のものだけでなく過去のものも管理用にすべて表示します）
-        async function loadMarcheSchedule() {
-            const listEl = document.getElementById("marche-schedule-list");
-            try {
-                const snapshot = await db.collection("marche_info").orderBy("date", "asc").get();
-                listEl.innerHTML = "";
-
-                if (snapshot.empty) {
-                    listEl.innerHTML = "<li>登録されたスケジュールはありません。</li>";
-                    return;
-                }
-
-                const todayStr = new Date().toISOString().split('T')[0];
-
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const isPast = data.date < todayStr;
-                    const li = document.createElement("li");
-                    li.className = "marche-item";
-                    li.innerHTML = `
-                        <div>
-                            <strong>${data.date}</strong>: ${data.name} ${isPast ? '<span style="color:gray;">(終了)</span>' : ''}
-                        </div>
-                        <button class="delete-btn" onclick="deleteMarche('${doc.id}')">削除</button>
-                    `;
-                    listEl.appendChild(li);
-                });
-            } catch (error) {
-                console.error(error);
-                listEl.innerHTML = "<li>データの取得に失敗しました。</li>";
-            }
+        try {
+            await db.collection("marche_info").doc(dateId).set(marcheData);
+            alert("マルシェ情報を登録しました！");
+            document.getElementById("marche-form").reset();
+            loadMarcheSchedule();
+        } catch (error) {
+            alert("登録に失敗しました: " + error.message);
         }
+    }
 
-        // データの登録
-        async function saveMarcheInfo(event) {
-            event.preventDefault();
-            const dateId = document.getElementById("marche-date").value; // YYYY-MM-DD
-
-            const marcheData = {
-                date: dateId,
-                name: document.getElementById("marche-name").value,
-                datetime: document.getElementById("marche-datetime").value,
-                location: document.getElementById("marche-location").value,
-                description: document.getElementById("marche-description").value,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            try {
-                // 日付をドキュメントIDにして保存
-                await db.collection("marche_info").doc(dateId).set(marcheData);
-                alert("マルシェ情報を登録しました！");
-                document.getElementById("marche-form").reset();
-                loadMarcheSchedule();
-            } catch (error) {
-                alert("登録に失敗しました: " + error.message);
-            }
+    // データの削除
+    async function deleteMarche(id) {
+        if (!confirm("このマルシェスケジュールを削除しますか？")) return;
+        try {
+            await db.collection("marche_info").doc(id).delete();
+            alert("削除しました。");
+            loadMarcheSchedule();
+        } catch (error) {
+            alert("削除に失敗しました: " + error.message);
         }
-
-        // データの削除
-        async function deleteMarche(id) {
-            if (!confirm("このマルシェスケジュールを削除しますか？")) return;
-            try {
-                await db.collection("marche_info").doc(id).delete();
-                alert("削除しました。");
-                loadMarcheSchedule();
-            } catch (error) {
-                alert("削除に失敗しました: " + error.message);
-            }
-        }
-    </script>
+    }
+</script>
 </body>
 </html>
