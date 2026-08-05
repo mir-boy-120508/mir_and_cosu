@@ -16,7 +16,7 @@
         body {
             font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
             color: #4a3b32;
-            background-color: #f5efe6; /* 管理画面は少し落ち着いたベージュ */
+            background-color: #f5efe6;
             padding: 20px;
         }
 
@@ -108,19 +108,31 @@
             font-weight: bold;
             text-align: center;
         }
-        .status.pending { background-color: #ffeacc; color: #b26a00; } /* 未受取 (確定済み) */
-        .status.completed { background-color: #d1e7dd; color: #0f5132; } /* 受取済 */
+        .status.pending { background-color: #ffeacc; color: #b26a00; }
+        .status.completed { background-color: #d1e7dd; color: #0f5132; }
+
+        /* 冷凍バッジ */
+        .frozen-badge {
+            display: inline-block;
+            background-color: #e0f2fe;
+            color: #0284c7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 5px;
+        }
 
         /* 注文内容 */
         .order-items {
             font-size: 1rem;
             color: #2b1f17;
-            white-space: pre-line; /* 改行を有効にする */
+            white-space: pre-line;
             line-height: 1.5;
             font-weight: bold;
         }
 
-        /* 💡 お店へのメッセージ装飾 */
+        /* お店へのメッセージ */
         .customer-message {
             margin-top: 8px;
             padding: 8px 12px;
@@ -194,7 +206,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // 最優先でFirebaseを初期化する
         const firebaseConfig = {
             apiKey: "AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",
             authDomain: "mir-and-cosu.firebaseapp.com",
@@ -212,7 +223,6 @@
     <script src="auth-check.js"></script>
 
     <script>
-        // ログイン監視とデータ取得を実行する
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 loadOrders();
@@ -222,14 +232,12 @@
             }
         });
 
-        // Firestoreから注文データを読み込んで表示する関数
         async function loadOrders() {
             const orderListEl = document.getElementById("order-list");
             try {
                 const snapshot = await db.collection("orders").orderBy("pickupDate", "asc").get();
                 orderListEl.innerHTML = "";
 
-                // 本日と翌日の日付文字列（YYYY-MM-DD）を取得
                 const now = new Date();
                 const todayStr = now.toISOString().split('T')[0];
                 
@@ -238,7 +246,7 @@
                 const tomorrowStr = tomorrow.toISOString().split('T')[0];
 
                 let pendingCount = 0;
-                let upcomingCount = 0; // 本日・翌日合計
+                let upcomingCount = 0;
                 let displayCount = 0;
 
                 snapshot.forEach(doc => {
@@ -257,11 +265,18 @@
                         }
                     }
 
+                    // 💡 冷凍フラグがあるかチェック (isFrozen, type === "frozen", 注文データ内の属性)
+                    const isFrozenOrder = data.isFrozen || data.type === "frozen" || data.deliveryType === "frozen";
+                    const frozenBadgeHtml = isFrozenOrder ? `<span class="frozen-badge">❄️ 冷凍</span>` : "";
+
                     let itemsText = "";
                     if (data.items) {
                         if (Array.isArray(data.items)) {
                             const activeItems = data.items.filter(item => item.quantity > 0);
-                            itemsText = activeItems.map(item => `・${item.name} × ${item.quantity}個`).join("\n");
+                            itemsText = activeItems.map(item => {
+                                const frozenItem = item.isFrozen ? " ❄️" : "";
+                                return `・${item.name}${frozenItem} × ${item.quantity}個`;
+                            }).join("\n");
                         } else if (typeof data.items === 'object') {
                             const itemList = [];
                             for (const [name, qty] of Object.entries(data.items)) {
@@ -280,7 +295,6 @@
                         itemsText = "商品詳細なし";
                     }
 
-                    // 💡 お店へのメッセージ（message, memo, note のどれに保存されていても取得できるように対応）
                     const userMsg = data.message || data.memo || data.note || "";
                     let msgHtml = "";
                     if (userMsg.trim() !== "") {
@@ -292,7 +306,7 @@
 
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
-                        <td><strong>${data.pickupDate || "-"}</strong></td>
+                        <td><strong>${data.pickupDate || "-"}</strong>${frozenBadgeHtml}</td>
                         <td class="order-items">
                             ${itemsText}
                             ${msgHtml}
