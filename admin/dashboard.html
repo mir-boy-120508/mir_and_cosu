@@ -120,6 +120,19 @@
             font-weight: bold;
         }
 
+        /* 💡 お店へのメッセージ装飾 */
+        .customer-message {
+            margin-top: 8px;
+            padding: 8px 12px;
+            background-color: #fff3e0;
+            border-left: 4px solid #d27d2d;
+            border-radius: 4px;
+            font-size: 0.88rem;
+            color: #5c3a21;
+            font-weight: normal;
+            white-space: pre-wrap;
+        }
+
         .nav-links {
             margin-top: 30px;
             padding-top: 15px;
@@ -156,7 +169,7 @@
                 <thead>
                     <tr>
                         <th style="width: 20%;">受取希望日</th>
-                        <th style="width: 50%;">注文内容</th>
+                        <th style="width: 50%;">注文内容・メッセージ</th>
                         <th style="width: 15%;">合計金額</th>
                         <th style="width: 15%;">状態</th>
                     </tr>
@@ -239,7 +252,6 @@
 
                     if (data.status === "ordered") {
                         pendingCount++;
-                        // 本日または翌日の受取予定の場合にカウント
                         if (data.pickupDate === todayStr || data.pickupDate === tomorrowStr) {
                             upcomingCount++;
                         }
@@ -268,13 +280,23 @@
                         itemsText = "商品詳細なし";
                     }
 
+                    // 💡 お店へのメッセージ（message, memo, note のどれに保存されていても取得できるように対応）
+                    const userMsg = data.message || data.memo || data.note || "";
+                    let msgHtml = "";
+                    if (userMsg.trim() !== "") {
+                        msgHtml = `<div class="customer-message">💬 <strong>メッセージ:</strong> ${userMsg}</div>`;
+                    }
+
                     const statusClass = (data.status === "completed") ? "status completed" : "status pending";
                     const statusText = (data.status === "completed") ? "受取済" : "未受取";
 
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td><strong>${data.pickupDate || "-"}</strong></td>
-                        <td class="order-items">${itemsText}</td>
+                        <td class="order-items">
+                            ${itemsText}
+                            ${msgHtml}
+                        </td>
                         <td>${data.totalPrice ? `¥${data.totalPrice.toLocaleString()}` : "-"}</td>
                         <td><span class="${statusClass}">${statusText}</span></td>
                     `;
