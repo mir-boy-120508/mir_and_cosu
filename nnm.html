@@ -260,22 +260,24 @@
         }
 
         .hero h1 {
-            top: 9vh;
-            font-size: clamp(2.4rem, 7vw, 5.8rem);
+            top: auto;
+            bottom: 18vh;
+            font-size: 2.4rem;
             font-weight: 800;
-            letter-spacing: -0.035em;
-            line-height: 1.18;
-            max-width: 760px;
+            letter-spacing: -0.015em;
+            line-height: 1.3;
+            max-width: 14ch;
         }
 
         .hero p {
-            top: 42vh;
-            font-size: clamp(1.5rem, 3.5vw, 3.2rem);
-            line-height: 1.45;
-            font-weight: 700;
-            letter-spacing: -0.025em;
-            max-width: 900px;
-            color: #fff;
+            top: auto;
+            bottom: 18vh;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            font-weight: 400;
+            letter-spacing: normal;
+            max-width: 34ch;
+            color: #f1e6da;
             opacity: 0;
         }
 
@@ -294,7 +296,15 @@
             .hero h1,
             .hero p {
                 left: max(24px, calc((100vw - 1072px) / 2));
-                right: max(24px, calc((100vw - 1072px) / 2));
+                right: auto;
+            }
+
+            .hero h1 {
+                font-size: 4rem;
+            }
+
+            .hero p {
+                font-size: 1.2rem;
             }
         }
 
@@ -310,8 +320,8 @@
                 opacity: 1;
                 transform: none !important;
             }
-            .hero h1 { top: 12vh; }
-            .hero p { top: auto; bottom: 10vh; }
+            .hero h1 { top: auto; bottom: 18vh; }
+            .hero p { top: auto; bottom: 18vh; }
             .hero-scroll-hint { display: none; }
         }
 
@@ -717,7 +727,7 @@
                 const titleProgress = ease(clamp(progress / 0.34));
                 title.style.opacity = String(1 - titleProgress);
                 title.style.transform =
-                    `translate3d(0, ${-18 * titleProgress}vh, 0) scale(${1 - 0.04 * titleProgress})`;
+                    `translate3d(0, ${-14 * titleProgress}vh, 0)`;
 
                 /*
                  * 0.25 → 0.68
@@ -726,7 +736,7 @@
                 const messageProgress = ease(clamp((progress - 0.23) / 0.38));
                 message.style.opacity = String(messageProgress);
                 message.style.transform =
-                    `translate3d(0, ${(1 - messageProgress) * 8}vh, 0)`;
+                    `translate3d(0, ${(1 - messageProgress) * 6}vh, 0)`;
 
                 /*
                  * 0.62 → 1.00
