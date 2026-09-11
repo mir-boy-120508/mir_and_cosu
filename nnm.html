@@ -605,12 +605,12 @@
     <header>
         <div class="header-container">
             <h1 class="logo">小さなパン工房ミール</h1>
-         　   <button class="menu-toggle" id="menu-toggle" type="button">
-　　　　　　　    <span></span>
-　　　　　　 　   <span></span>
-  　　　　　　　  <span></span>
-             </button>
-            <nav>
+            <button class="menu-toggle" id="menu-toggle" type="button" aria-label="メニューを開く" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav id="site-nav">
                 <ul>
                     <li><a href="/" class="active">ホーム</a></li>
                     <li><a href="/menu">メニュー</a></li>
@@ -787,6 +787,28 @@
     </footer>
 
     <script>
+        /* ===== スマホ用ハンバーガーメニュー ===== */
+        (() => {
+            const menuToggle = document.getElementById("menu-toggle");
+            const siteNav = document.getElementById("site-nav");
+
+            if (!menuToggle || !siteNav) return;
+
+            menuToggle.addEventListener("click", () => {
+                const isOpen = siteNav.classList.toggle("is-open");
+                menuToggle.setAttribute("aria-expanded", String(isOpen));
+            });
+
+            siteNav.querySelectorAll("a").forEach(link => {
+                link.addEventListener("click", () => {
+                    siteNav.classList.remove("is-open");
+                    menuToggle.setAttribute("aria-expanded", "false");
+                });
+            });
+        })();
+    </script>
+
+    <script>
         /* ===== ヒーローのスクロール演出 ===== */
         (() => {
             const section = document.getElementById("hero-scroll");
@@ -920,14 +942,5 @@
             }
         });
     </script>
-            <script>
-    const menuToggle = document.getElementById('menu-toggle');
-    const siteNav = document.getElementById('site-nav');
-
-    menuToggle.addEventListener('click', () => {
-        siteNav.classList.toggle('is-open');
-        menuToggle.classList.toggle('is-open');
-    });
-</script>
 </body>
 </html>
