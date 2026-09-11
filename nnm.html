@@ -194,6 +194,55 @@
             }
         }
 
+        .menu-toggle {
+    display: none;
+    border: none;
+    background: transparent;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.menu-toggle span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    margin: 5px 0;
+    background: #705d53;
+}
+
+@media (max-width: 599px) {
+    .header-container {
+        position: relative;
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 10px 20px;
+    }
+
+    nav.is-open {
+        display: block;
+    }
+
+    nav ul {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    nav ul li {
+        margin: 0;
+    }
+}
+
         /* ===== おしらせバー ===== */
         .news-bar {
             background-color: var(--cream-deep);
@@ -332,6 +381,14 @@
                 opacity: 1;
                 transform: none !important;
             }
+            .hero h1,
+.hero p {
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    margin: 0;
+    text-align: left;
+}
             .hero h1 { top: auto; bottom: 18vh; }
             .hero p { top: auto; bottom: 26vh; }
             .hero-scroll-hint { display: none; }
@@ -530,6 +587,11 @@
     <header>
         <div class="header-container">
             <h1 class="logo">小さなパン工房ミール</h1>
+         　   <button class="menu-toggle" id="menu-toggle" type="button">
+　　　　　　　    <span></span>
+　　　　　　 　   <span></span>
+  　　　　　　　  <span></span>
+             </button>
             <nav>
                 <ul>
                     <li><a href="/" class="active">ホーム</a></li>
@@ -840,5 +902,14 @@
             }
         });
     </script>
+            <script>
+    const menuToggle = document.getElementById('menu-toggle');
+    const siteNav = document.getElementById('site-nav');
+
+    menuToggle.addEventListener('click', () => {
+        siteNav.classList.toggle('is-open');
+        menuToggle.classList.toggle('is-open');
+    });
+</script>
 </body>
 </html>
