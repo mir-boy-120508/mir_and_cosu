@@ -172,79 +172,8 @@
             white-space: nowrap;
         }
 
-        nav ul li a:hover,
-        nav ul li a.active {
+        nav ul li a:hover, nav ul li a.active {
             color: #d27d2d;
-        }
-
-        .menu-toggle {
-            display: none;
-            border: none;
-            background: transparent;
-            padding: 0;
-            width: 44px;
-            height: 44px;
-            cursor: pointer;
-        }
-
-        .menu-toggle span {
-            display: block;
-            width: 24px;
-            height: 2px;
-            margin: 5px 0;
-            background: #705d53;
-        }
-
-        @media (max-width: 599px) {
-            .header-container {
-                position: relative;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                gap: 0;
-            }
-
-            .logo {
-                text-align: left;
-            }
-
-            .menu-toggle {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-            }
-
-            nav {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: #ffffff;
-                padding: 10px 20px;
-                border-top: 1px solid #f0e6df;
-                box-shadow: 0 10px 24px rgba(74, 59, 50, 0.08);
-            }
-
-            nav.is-open {
-                display: block;
-            }
-
-            nav ul {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            nav ul li {
-                margin: 0;
-            }
-
-            nav ul li a {
-                display: block;
-                padding: 12px 4px;
-                text-align: left;
-            }
         }
 
         @media (min-width: 600px) {
@@ -253,16 +182,13 @@
                 justify-content: space-between;
                 padding: 15px 20px;
             }
-
             nav ul li {
                 margin-left: 15px;
                 margin-right: 0;
             }
-
             .logo {
                 font-size: 1.5rem;
             }
-
             nav ul li a {
                 font-size: 0.95rem;
             }
@@ -340,9 +266,8 @@
         .hero p {
             position: absolute;
             left: 24px;
-            right: auto;
+            right: 24px;
             margin: 0;
-            text-align: left;
             will-change: transform, opacity;
         }
 
@@ -605,12 +530,7 @@
     <header>
         <div class="header-container">
             <h1 class="logo">小さなパン工房ミール</h1>
-            <button class="menu-toggle" id="menu-toggle" type="button" aria-label="メニューを開く" aria-expanded="false">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <nav id="site-nav">
+            <nav>
                 <ul>
                     <li><a href="/" class="active">ホーム</a></li>
                     <li><a href="/menu">メニュー</a></li>
@@ -785,28 +705,6 @@
     <footer>
         <p>&copy; 2026 小さなパン工房ミール. All Rights Reserved.</p>
     </footer>
-
-    <script>
-        /* ===== スマホ用ハンバーガーメニュー ===== */
-        (() => {
-            const menuToggle = document.getElementById("menu-toggle");
-            const siteNav = document.getElementById("site-nav");
-
-            if (!menuToggle || !siteNav) return;
-
-            menuToggle.addEventListener("click", () => {
-                const isOpen = siteNav.classList.toggle("is-open");
-                menuToggle.setAttribute("aria-expanded", String(isOpen));
-            });
-
-            siteNav.querySelectorAll("a").forEach(link => {
-                link.addEventListener("click", () => {
-                    siteNav.classList.remove("is-open");
-                    menuToggle.setAttribute("aria-expanded", "false");
-                });
-            });
-        })();
-    </script>
 
     <script>
         /* ===== ヒーローのスクロール演出 ===== */
