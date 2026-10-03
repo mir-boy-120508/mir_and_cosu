@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#8b5a2b">
+<title>マルシェ販売 | 小さなパン工房ミール</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--brown:#8b5a2b;--brown2:#705d53;--orange:#d27d2d;--cream:#f5efe6;--paper:#fff;--soft:#fff9f5;--line:#eaddd5;--text:#4a3b32;--muted:#8d7c70;--danger:#c94a4a;--green:#4d7c5a}
+body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;background:var(--cream);color:var(--text);min-height:100vh;padding-bottom:30px}
+button,input,select{font:inherit}button{cursor:pointer}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(139,90,43,.98);color:#fff;padding:13px max(16px,env(safe-area-inset-left)) 13px;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.topbar-inner{max-width:1180px;margin:auto;display:flex;align-items:center;gap:12px}.brand{font-weight:800;font-size:1.05rem;flex:1}.brand small{display:block;font-weight:400;font-size:.72rem;opacity:.82;margin-top:2px}.top-link{color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.35);padding:8px 11px;border-radius:8px;font-size:.84rem}
+.container{max-width:1180px;margin:18px auto;padding:0 14px}.page-title{margin:6px 0 15px}.page-title h1{font-size:1.55rem;color:var(--brown)}.page-title p{font-size:.88rem;color:var(--muted);margin-top:4px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 5px 18px rgba(74,59,50,.06);padding:16px;margin-bottom:16px}.panel h2{font-size:1.08rem;color:var(--brown);margin-bottom:12px;border-left:4px solid var(--orange);padding-left:9px}
+.event-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:12px}.field label{display:block;font-size:.78rem;font-weight:700;color:var(--muted);margin-bottom:5px}.field select,.field input{width:100%;border:1px solid #cdbeb3;background:#fff;border-radius:9px;padding:11px;color:var(--text)}
+.event-info{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:12px;min-height:100%}.event-info .event-name{font-weight:800;color:var(--brown);font-size:1.05rem}.event-info .event-meta{font-size:.84rem;line-height:1.7;margin-top:6px}.event-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.btn{border:0;border-radius:9px;padding:10px 13px;font-weight:700}.btn-primary{background:var(--orange);color:#fff}.btn-primary:hover{background:#b66620}.btn-secondary{background:#eaddd5;color:var(--text)}.btn-green{background:var(--green);color:#fff}.btn-danger{background:#fff0f0;color:var(--danger);border:1px solid #efcaca}.btn:disabled{opacity:.5;cursor:not-allowed}
+.notice{padding:10px 12px;border-radius:9px;background:#fff8e8;border:1px solid #ecd6a0;font-size:.84rem;color:#765d31;margin-top:10px}.hidden{display:none!important}
+.plan-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:430px;overflow:auto;padding-right:3px}.plan-item{display:grid;grid-template-columns:1fr 86px;gap:8px;align-items:center;background:#fffaf7;border:1px solid var(--line);border-radius:9px;padding:9px}.plan-item strong{font-size:.86rem}.plan-item small{display:block;color:var(--muted);font-size:.73rem;margin-top:2px}.plan-item input{width:100%;text-align:center;padding:8px;border:1px solid #cdbeb3;border-radius:7px}.plan-total{margin-top:11px;display:flex;justify-content:space-between;font-weight:800}
+.pos-layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(300px,.6fr);gap:14px}.cat-tabs{display:flex;gap:7px;overflow:auto;padding-bottom:9px}.cat-tabs button{white-space:nowrap;border:1px solid var(--line);background:#fff9f5;color:var(--brown2);border-radius:999px;padding:8px 12px;font-weight:700}.cat-tabs button.active{background:var(--brown);color:#fff;border-color:var(--brown)}
+.product-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.product-card{border:1px solid var(--line);background:#fffaf7;border-radius:11px;padding:11px;min-height:112px;display:flex;flex-direction:column;justify-content:space-between}.product-card.soldout{opacity:.48}.product-name{font-weight:800;font-size:.87rem;line-height:1.35}.product-price{color:var(--orange);font-weight:800;margin-top:3px}.stock{font-size:.73rem;color:var(--muted);margin:4px 0 7px}.add-btn{width:100%;padding:9px;border:0;border-radius:8px;background:var(--brown);color:#fff;font-weight:800}.add-btn:active{transform:scale(.98)}
+.cart{position:sticky;top:74px}.cart-list{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:10px;background:#fffaf7}.cart-empty{padding:25px 10px;text-align:center;color:var(--muted);font-size:.85rem}.cart-row{padding:10px;border-bottom:1px dashed var(--line)}.cart-row:last-child{border-bottom:0}.cart-top{display:flex;gap:8px}.cart-top strong{flex:1;font-size:.85rem}.cart-price{font-weight:800;color:var(--orange);font-size:.84rem}.cart-controls{display:flex;align-items:center;gap:7px;margin-top:7px}.mini{width:30px;height:30px;border:0;border-radius:7px;background:#eaddd5;color:var(--text);font-weight:900}.qty{min-width:24px;text-align:center;font-weight:800}.remove{margin-left:auto;background:none;border:0;color:var(--danger);font-size:.75rem}.totals{margin-top:12px;padding:12px;background:#fff9f5;border:1px solid var(--line);border-radius:10px}.total-line{display:flex;justify-content:space-between;font-size:.9rem;margin:5px 0}.grand{font-size:1.3rem;font-weight:900;color:var(--brown);padding-top:7px;border-top:1px dashed var(--line);margin-top:7px}.checkout{width:100%;margin-top:10px;padding:14px;border:0;border-radius:10px;background:var(--orange);color:#fff;font-weight:900;font-size:1.05rem}.checkout:disabled{background:#c8bbb1}
+.status-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}.pill{padding:5px 9px;border-radius:999px;font-size:.75rem;font-weight:800;background:#eee5de}.pill.open{background:#e8f3ea;color:#39704a}.pill.closed{background:#eee;color:#777}.live{margin-left:auto;font-size:.76rem;color:var(--green);font-weight:700}.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.stat{background:#fffaf7;border:1px solid var(--line);border-radius:10px;padding:10px}.stat small{display:block;color:var(--muted);font-size:.72rem}.stat strong{display:block;color:var(--brown);font-size:1.15rem;margin-top:3px}.sales-history{margin-top:12px;max-height:270px;overflow:auto;border:1px solid var(--line);border-radius:10px}.sale-history-row{display:grid;grid-template-columns:1fr auto;gap:8px;padding:9px 10px;border-bottom:1px dashed var(--line);font-size:.82rem}.sale-history-row:last-child{border-bottom:0}.sale-history-row small{display:block;color:var(--muted);margin-top:2px}.payment-badges{display:flex;gap:5px;flex-wrap:wrap}.payment-badges span{font-size:.68rem;background:#eee5de;border-radius:999px;padding:3px 6px}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(50,38,30,.5);display:flex;align-items:flex-end;justify-content:center;padding:12px}.modal-card{background:#fff;border-radius:16px;padding:18px;width:min(500px,100%);box-shadow:0 10px 40px rgba(0,0,0,.25)}.modal-card h3{color:var(--brown);margin-bottom:12px}.payment-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px}.payment-tabs button{padding:10px;border:1px solid var(--line);background:#fff9f5;border-radius:8px;font-weight:800}.payment-tabs button.active{background:var(--brown);color:#fff}.cash-field{margin-bottom:12px}.cash-field label{display:block;font-size:.8rem;font-weight:700;margin-bottom:5px}.cash-field input{width:100%;font-size:1.25rem;padding:11px;border:2px solid #cdbeb3;border-radius:9px}.change{font-size:1.1rem;font-weight:900;text-align:right;color:var(--green);margin:8px 0}.modal-actions{display:flex;gap:8px}.modal-actions button{flex:1}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:80;background:#4a3b32;color:#fff;padding:11px 15px;border-radius:999px;box-shadow:0 5px 18px rgba(0,0,0,.25);font-size:.82rem}.loading{color:var(--muted);padding:15px;text-align:center}
+@media(max-width:850px){.event-grid,.pos-layout{grid-template-columns:1fr}.cart{position:static}.product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.summary-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.container{padding:0 9px}.panel{padding:12px}.plan-grid{grid-template-columns:1fr}.product-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.product-card{padding:9px;min-height:108px}.product-name{font-size:.8rem}.page-title h1{font-size:1.35rem}.top-link{padding:7px 8px}.summary-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">🍞 小さなパン工房ミール<small>マルシェ販売 POS</small></div>
+    <a class="top-link" href="/admin">管理画面</a>
+    <a class="top-link" href="/admin/marche">マルシェ予定</a>
+  </div>
+</header>
+
+<main class="container">
+  <div class="page-title">
+    <h1>🎪 マルシェ販売</h1>
+    <p>/admin/marche の出店予定と同期して、当日の販売・在庫・売上をまとめて管理します。</p>
+  </div>
+
+  <section class="panel">
+    <h2>① マルシェを選ぶ</h2>
+    <div class="event-grid">
+      <div>
+        <div class="field"><label for="event-select">出店予定</label><select id="event-select"><option value="">読み込み中...</option></select></div>
+        <div class="event-actions">
+          <button class="btn btn-secondary" id="refresh-events">予定を再読み込み</button>
+          <a class="btn btn-secondary" href="/admin/marche" style="text-decoration:none">予定を追加・変更</a>
+        </div>
+      </div>
+      <div class="event-info" id="event-info"><div class="loading">マルシェを選択してください。</div></div>
+    </div>
+  </section>
+
+  <section class="panel" id="plan-panel">
+    <h2>② このマルシェの販売予定を組む</h2>
+    <div id="plan-message" class="notice">上のマルシェを選択すると、販売予定を作成できます。</div>
+    <div id="plan-content" class="hidden">
+      <p style="font-size:.82rem;color:var(--muted);margin-bottom:10px">当日持っていく数量を入力してください。保存すると、このPOS専用の在庫として管理されます。</p>
+      <div class="plan-grid" id="plan-grid"></div>
+      <div class="plan-total"><span>予定数量</span><span id="plan-total">0個</span></div>
+      <div class="event-actions">
+        <button class="btn btn-primary" id="save-plan">販売予定を保存する</button>
+        <button class="btn btn-green hidden" id="open-sale">この予定を販売開始</button>
+        <button class="btn btn-secondary hidden" id="sync-event">マルシェ情報を同期</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel hidden" id="pos-panel">
+    <div class="status-row">
+      <h2 style="margin:0;flex:1">③ 当日のPOS</h2>
+      <span class="pill" id="sale-status">未開始</span>
+      <span class="live">● Firebase同期</span>
+    </div>
+    <div class="pos-layout">
+      <div>
+        <div class="cat-tabs" id="cat-tabs"></div>
+        <div class="product-grid" id="product-grid"></div>
+      </div>
+      <aside class="cart panel" style="margin:0;padding:12px">
+        <h2>🧺 お会計</h2>
+        <div class="cart-list" id="cart-list"><div class="cart-empty">商品をタップして追加してください。</div></div>
+        <div class="totals">
+          <div class="total-line"><span>点数</span><strong id="cart-count">0点</strong></div>
+          <div class="total-line grand"><span>合計</span><strong id="cart-total">¥0</strong></div>
+        </div>
+        <button class="checkout" id="checkout" disabled>会計する</button>
+      </aside>
+    </div>
+  </section>
+
+  <section class="panel hidden" id="summary-panel">
+    <div class="status-row"><h2 style="margin:0;flex:1">④ 売上・在庫</h2><button class="btn btn-danger" id="close-sale">販売終了</button></div>
+    <div class="summary-grid">
+      <div class="stat"><small>売上</small><strong id="stat-sales">¥0</strong></div>
+      <div class="stat"><small>会計件数</small><strong id="stat-orders">0件</strong></div>
+      <div class="stat"><small>現金</small><strong id="stat-cash">¥0</strong></div>
+      <div class="stat"><small>カード等</small><strong id="stat-other">¥0</strong></div>
+    </div>
+    <div class="sales-history" id="sales-history"><div class="loading">会計履歴を読み込み中...</div></div>
+  </section>
+</main>
+
+<div class="modal hidden" id="payment-modal">
+  <div class="modal-card">
+    <h3>💴 お会計</h3>
+    <div style="font-size:1.35rem;font-weight:900;text-align:right;color:var(--brown);margin-bottom:12px" id="modal-total">¥0</div>
+    <div class="payment-tabs">
+      <button data-payment="cash" class="active">現金</button>
+      <button data-payment="card">カード</button>
+      <button data-payment="other">その他</button>
+    </div>
+    <div class="cash-field" id="cash-field"><label for="cash-received">お預かり</label><input id="cash-received" type="number" inputmode="numeric" min="0" step="1" placeholder="例：1000"><div class="change" id="change">お釣り ¥0</div></div>
+    <div class="modal-actions"><button class="btn btn-secondary" id="cancel-payment">キャンセル</button><button class="btn btn-primary" id="confirm-payment">会計を確定</button></div>
+  </div>
+</div>
+<div class="toast hidden" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig={apiKey:"AIzaSyAnEWphWXdlGamhQPp5i1HFOg6TcDoQqdg",authDomain:"mir-and-cosu.firebaseapp.com",projectId:"mir-and-cosu",storageBucket:"mir-and-cosu.firebasestorage.app",messagingSenderId:"597556523101",appId:"1:597556523101:web:338d402cd97dbf23c15db4",measurementId:"G-294PKSL137"};
+if(!firebase.apps.length)firebase.initializeApp(firebaseConfig); const db=firebase.firestore();
+
+const PRODUCTS=[
+ ["ドーナツ","ドーナツ（プレーン）",270],["ドーナツ","ココアドーナツ",310],["ドーナツ","あんドーナツ",290],
+ ["ベーグル","ベーグル（プレーン）",250],["ベーグル","ベーグル（チョコチップ）",320],["ベーグル","ベーグル（チョコとくるみ）",320],["ベーグル","ベーグル（ダブルチーズ）",320],["ベーグル","ベーグル（黒ごま塩）",300],["ベーグル","ベーグル（黒ごまチーズ）",320],["ベーグル","ベーグル（オニオンチーズベーコン）",350],["ベーグル","ベーグル（ウインナー Mum）",350],["ベーグル","ベーグル（クランベリーとクリームチーズ）",340],["ベーグル","ベーグル（高菜そぼろチーズ）",350],["ベーグル","ベーグル（あんことクリームチーズ）",340],["ベーグル","ベーグル（いちじくキャラメルナッツ）",340],
+ ["食パン","ホテルブレッド",480],["食パン","くるみとレーズンの黒糖食パン",510],
+ ["米粉のおやつ","米粉のシフォン（プレーン）",250],["米粉のおやつ","米粉のシフォン（チョコチップ）",270],["米粉のおやつ","米粉のシフォン（ミルクティー）",270],["米粉のおやつ","米粉のシフォン（コーヒーチョコ）",270],["米粉のおやつ","米粉のベイクドチーズケーキ",400],["米粉のおやつ","米粉のレモンパウンドケーキ",280]
+].map(([category,name,price])=>({category,name,price}));
+
+let events=[], selectedEvent=null, currentSale=null, stock={}, cart={}, activeCategory="すべて", paymentType="cash", unsubscribeSale=null, unsubscribeTransactions=null;
+const $=id=>document.getElementById(id); const yen=n=>`¥${Number(n||0).toLocaleString("ja-JP")}`;
+function esc(v){return String(v??"").replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+function toast(msg){$("toast").textContent=msg;$("toast").classList.remove("hidden");clearTimeout(toast.t);toast.t=setTimeout(()=>$("toast").classList.add("hidden"),2600)}
+function today(){return new Date().toLocaleDateString("sv-SE")}
+
+firebase.auth().onAuthStateChanged(user=>{if(!user){location.href="/admin/login";}else{loadEvents();}});
+
+async function loadEvents(){
+  try{
+    const snap=await db.collection("marche_info").orderBy("date","asc").get(); events=snap.docs.map(d=>({id:d.id,...d.data()}));
+    const select=$("event-select"); select.innerHTML="";
+    const upcoming=events.filter(e=>!e.date||e.date>=today());
+    const list=upcoming.length?upcoming:events;
+    if(!list.length){select.innerHTML='<option value="">マルシェ予定がありません</option>';clearEvent();return;}
+    select.innerHTML='<option value="">選択してください</option>'+list.map(e=>`<option value="${esc(e.id)}">${esc(e.date)}｜${esc(e.name||"出店予定")}</option>`).join("");
+    select.value="";
+  }catch(e){console.error(e);$("event-select").innerHTML='<option value="">読み込み失敗</option>';toast("マルシェ予定の取得に失敗しました。")}
+}
+
+async function selectEvent(id){
+  stopListeners(); currentSale=null; stock={}; cart={}; renderCart(); hidePos();
+  if(!id){clearEvent();return}
+  selectedEvent=events.find(e=>e.id===id)||null;
+  if(!selectedEvent){clearEvent();return}
+  renderEventInfo();
+  await loadSalePlan();
+}
+function clearEvent(){selectedEvent=null;$("event-info").innerHTML='<div class="loading">マルシェを選択してください。</div>';$("plan-content").classList.add("hidden");$("plan-message").textContent="上のマルシェを選択すると、販売予定を作成できます。";$("summary-panel").classList.add("hidden");}
+function renderEventInfo(){
+ const e=selectedEvent; $("event-info").innerHTML=`<div class="event-name">🎪 ${esc(e.name||"出店予定")}</div><div class="event-meta">📅 ${esc(e.datetime||e.date||"-")}<br>📍 ${esc(e.location||"-")}${e.description?`<br>💬 ${esc(e.description)}`:""}</div>`;
+}
+
+async function loadSalePlan(){
+  $("plan-message").textContent="販売予定を確認しています…";
+  try{
+   const ref=db.collection("marche_sales").doc(selectedEvent.id); const doc=await ref.get();
+   if(doc.exists){currentSale={id:doc.id,...doc.data()}; stock=currentSale.stock||{}; renderPlanEditor(currentSale); showPosForSale(); startListeners();}
+   else{currentSale=null; renderPlanEditor(null); $("plan-message").textContent="このマルシェの販売予定はまだありません。数量を入力して新しく作成してください。"; $("plan-content").classList.remove("hidden"); $("open-sale").classList.add("hidden");$("sync-event").classList.add("hidden");$("pos-panel").classList.add("hidden");$("summary-panel").classList.add("hidden");}
+  }catch(e){console.error(e);$("plan-message").textContent="販売予定の取得に失敗しました。Firestoreの権限も確認してください。";$("plan-content").classList.remove("hidden");}
+}
+function renderPlanEditor(sale){
+ const grid=$("plan-grid"); grid.innerHTML=PRODUCTS.map(p=>{const v=sale?(sale.initialStock?.[p.name]??sale.stock?.[p.name]??0):0;return `<div class="plan-item"><div><strong>${esc(p.name)}</strong><small>${yen(p.price)}</small></div><input class="plan-input" data-name="${esc(p.name)}" type="number" min="0" step="1" value="${Number(v)}"></div>`}).join("");
+ updatePlanTotal(); $("plan-content").classList.remove("hidden"); $("save-plan").textContent=sale?"販売予定を更新する":"販売予定を保存する";
+ $("open-sale").classList.toggle("hidden",!sale||sale.status==="closed"); $("sync-event").classList.toggle("hidden",!sale);
+ $("plan-message").textContent=sale?`販売予定あり：${sale.status==="open"?"販売中":"未販売"}。数量を変更する場合は更新してください。`:"";
+}
+function getPlanStock(){const result={};document.querySelectorAll(".plan-input").forEach(i=>result[i.dataset.name]=Math.max(0,parseInt(i.value,10)||0));return result}
+function updatePlanTotal(){let t=0;document.querySelectorAll(".plan-input").forEach(i=>t+=Math.max(0,parseInt(i.value,10)||0));$("plan-total").textContent=`${t}個`}
+
+async function savePlan(){
+ if(!selectedEvent)return toast("マルシェを選択してください。"); const newStock=getPlanStock(); const ref=db.collection("marche_sales").doc(selectedEvent.id);
+ try{
+  const old=currentSale; const data={marcheId:selectedEvent.id,date:selectedEvent.date||selectedEvent.id,name:selectedEvent.name||"出店予定",datetime:selectedEvent.datetime||"",location:selectedEvent.location||"",description:selectedEvent.description||"",initialStock:old?.initialStock||newStock,stock:newStock,status:old?.status||"planned",updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+  if(!old)data.createdAt=firebase.firestore.FieldValue.serverTimestamp();
+  else if(old.status==="open"){ // 販売中に予定数を変える場合は、残数を壊さないように禁止
+    return toast("販売中は予定数量を変更できません。販売終了後に変更してください。");
+  }
+  await ref.set(data,{merge:true}); currentSale={id:ref.id,...data}; stock=newStock; renderPlanEditor(currentSale); startListeners(); showPosForSale(); toast("販売予定を保存しました！");
+ }catch(e){console.error(e);alert("保存に失敗しました。\n"+e.message)}
+}
+
+async function syncEvent(){
+ if(!selectedEvent||!currentSale)return; try{const fresh=await db.collection("marche_info").doc(selectedEvent.id).get();if(!fresh.exists)return toast("元のマルシェ予定が見つかりません。");selectedEvent={id:fresh.id,...fresh.data()};renderEventInfo();await db.collection("marche_sales").doc(selectedEvent.id).update({name:selectedEvent.name||"出店予定",date:selectedEvent.date||selectedEvent.id,datetime:selectedEvent.datetime||"",location:selectedEvent.location||"",description:selectedEvent.description||"",updatedAt:firebase.firestore.FieldValue.serverTimestamp()});currentSale={...currentSale,name:selectedEvent.name,date:selectedEvent.date,datetime:selectedEvent.datetime,location:selectedEvent.location,description:selectedEvent.description};toast("マルシェ予定の情報を同期しました！");}catch(e){alert("同期に失敗しました。\n"+e.message)}}
+
+async function openSale(){if(!currentSale)return;try{await db.collection("marche_sales").doc(currentSale.id).update({status:"open",openedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});toast("販売を開始しました！");}catch(e){alert("販売開始に失敗しました。\n"+e.message)}}
+async function closeSale(){if(!currentSale||!confirm("このマルシェの販売を終了しますか？\n終了後はPOSから会計できなくなります。"))return;try{await db.collection("marche_sales").doc(currentSale.id).update({status:"closed",closedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});toast("販売を終了しました。");}catch(e){alert("販売終了に失敗しました。\n"+e.message)}}
+
+function showPosForSale(){$("pos-panel").classList.remove("hidden");$("summary-panel").classList.remove("hidden");renderCategories();renderProducts();updateStatus();}
+function hidePos(){ $("pos-panel").classList.add("hidden");$("summary-panel").classList.add("hidden"); }
+function renderCategories(){const cats=["すべて",...new Set(PRODUCTS.map(p=>p.category))];$("cat-tabs").innerHTML=cats.map(c=>`<button class="${c===activeCategory?'active':''}" data-cat="${esc(c)}">${esc(c)}</button>`).join("")}
+function renderProducts(){const arr=activeCategory==="すべて"?PRODUCTS:PRODUCTS.filter(p=>p.category===activeCategory);$("product-grid").innerHTML=arr.map(p=>{const s=Number(stock[p.name]||0),sold=s<=0;return `<div class="product-card ${sold?'soldout':''}"><div><div class="product-name">${esc(p.name)}</div><div class="product-price">${yen(p.price)}</div></div><div><div class="stock">残り ${s}個</div><button class="add-btn" ${sold||!currentSale||currentSale.status!=="open"?'disabled':''} data-add="${esc(p.name)}">${sold?'売り切れ':currentSale?.status==="open"?'＋ 追加':'販売開始待ち'}</button></div></div>`}).join("")}
+function addToCart(name){const p=PRODUCTS.find(x=>x.name===name);if(!p||!currentSale||currentSale.status!=="open")return;const max=Number(stock[name]||0);if((cart[name]||0)>=max)return toast("在庫がありません。");cart[name]=(cart[name]||0)+1;renderCart()}
+function changeCart(name,d){const q=(cart[name]||0)+d;if(q<=0)delete cart[name];else cart[name]=Math.min(q,Number(stock[name]||0));renderCart()}
+function renderCart(){const entries=Object.entries(cart).map(([name,qty])=>({p:PRODUCTS.find(p=>p.name===name),qty})).filter(x=>x.p);const count=entries.reduce((a,x)=>a+x.qty,0),total=entries.reduce((a,x)=>a+x.qty*x.p.price,0);$("cart-count").textContent=`${count}点`;$("cart-total").textContent=yen(total);$("checkout").disabled=!count||!currentSale||currentSale.status!=="open";$("cart-list").innerHTML=entries.length?entries.map(({p,qty})=>`<div class="cart-row"><div class="cart-top"><strong>${esc(p.name)}</strong><span class="cart-price">${yen(p.price*qty)}</span></div><div class="cart-controls"><button class="mini" data-minus="${esc(p.name)}">−</button><span class="qty">${qty}</span><button class="mini" data-plus="${esc(p.name)}">＋</button><button class="remove" data-remove="${esc(p.name)}">削除</button></div></div>`).join(""):'<div class="cart-empty">商品をタップして追加してください。</div>';$("modal-total").textContent=yen(total);updateChange()}
+function openPayment(){if(!Object.keys(cart).length)return;paymentType="cash";document.querySelectorAll(".payment-tabs button").forEach(b=>b.classList.toggle("active",b.dataset.payment===paymentType));$("cash-field").classList.remove("hidden");$("cash-received").value="";$("payment-modal").classList.remove("hidden");setTimeout(()=>$("cash-received").focus(),50)}
+function updateChange(){const total=Object.entries(cart).reduce((a,[n,q])=>a+PRODUCTS.find(p=>p.name===n).price*q,0);const received=parseInt($("cash-received").value,10)||0;$("change").textContent=paymentType==="cash"?(received>=total?`お釣り ${yen(received-total)}`:`あと ${yen(total-received)}`):"現金以外のお支払い"}
+
+async function completePayment(){
+ if(!currentSale||currentSale.status!=="open")return; const items=Object.entries(cart).map(([name,qty])=>{const p=PRODUCTS.find(x=>x.name===name);return {name,qty,price:p.price,subtotal:p.price*qty}}); const total=items.reduce((a,x)=>a+x.subtotal,0);const received=parseInt($("cash-received").value,10)||0;if(paymentType==="cash"&&received<total)return toast("お預かり金額が足りません。");
+ const saleRef=db.collection("marche_sales").doc(currentSale.id);const txRef=saleRef.collection("transactions").doc();
+ try{
+  await db.runTransaction(async tx=>{
+   const snap=await tx.get(saleRef);if(!snap.exists)throw new Error("販売予定が見つかりません。");const d=snap.data();if(d.status!=="open")throw new Error("この販売は終了しています。");const current=d.stock||{};const next={...current};
+   items.forEach(item=>{const available=Number(current[item.name]||0);if(available<item.qty)throw new Error(`「${item.name}」の在庫が不足しています（残り${available}個）。`);next[item.name]=available-item.qty});
+   const salesTotal=Number(d.totalSales||0)+total, orderCount=Number(d.orderCount||0)+1; const payments={...(d.paymentTotals||{})};payments[paymentType]=Number(payments[paymentType]||0)+total;
+   tx.update(saleRef,{stock:next,totalSales:salesTotal,orderCount,paymentTotals:payments,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+   tx.set(txRef,{items,totalPrice:total,paymentType,received:paymentType==="cash"?received:null,change:paymentType==="cash"?received-total:null,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  });
+  cart={};renderCart();$("payment-modal").classList.add("hidden");toast(`会計完了 ${yen(total)}`);
+ }catch(e){console.error(e);alert("会計を確定できませんでした。\n"+e.message)}
+}
+
+function updateStatus(){if(!currentSale)return;const s=$("sale-status");s.textContent=currentSale.status==="open"?"販売中":currentSale.status==="closed"?"販売終了":"未開始";s.className="pill "+(currentSale.status||"");$("open-sale").classList.toggle("hidden",currentSale.status!=="planned");$("close-sale").disabled=currentSale.status!=="open";renderProducts()}
+function startListeners(){stopListeners();if(!selectedEvent)return;const ref=db.collection("marche_sales").doc(selectedEvent.id);unsubscribeSale=ref.onSnapshot(doc=>{if(!doc.exists)return;currentSale={id:doc.id,...doc.data()};stock=currentSale.stock||{};renderPlanEditor(currentSale);updateStatus();renderProducts();});unsubscribeTransactions=ref.collection("transactions").orderBy("createdAt","desc").limit(50).onSnapshot(s=>{renderHistory(s.docs);});}
+function stopListeners(){if(unsubscribeSale)unsubscribeSale();if(unsubscribeTransactions)unsubscribeTransactions();unsubscribeSale=null;unsubscribeTransactions=null}
+function renderHistory(docs){const rows=docs.map(d=>{const x=d.data();const items=(x.items||[]).map(i=>`${esc(i.name)}×${i.qty}`).join("、");const t=x.createdAt?.toDate?x.createdAt.toDate().toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"}):"--:--";const payment=x.paymentType==="cash"?"現金":x.paymentType==="card"?"カード":"その他";return `<div class="sale-history-row"><div><strong>${t}　${yen(x.totalPrice)}</strong><small>${items}</small></div><div class="payment-badges"><span>${payment}</span></div></div>`}).join("");$("sales-history").innerHTML=rows||'<div class="loading">まだ会計はありません。</div>';if(currentSale){$("stat-sales").textContent=yen(currentSale.totalSales||0);$("stat-orders").textContent=`${currentSale.orderCount||0}件`;$("stat-cash").textContent=yen(currentSale.paymentTotals?.cash||0);$("stat-other").textContent=yen((currentSale.paymentTotals?.card||0)+(currentSale.paymentTotals?.other||0));}}
+
+document.addEventListener("click",e=>{const t=e.target;if(t.matches("[data-cat]")){activeCategory=t.dataset.cat;renderCategories();renderProducts()}if(t.matches("[data-add]"))addToCart(t.dataset.add);if(t.matches("[data-minus]"))changeCart(t.dataset.minus,-1);if(t.matches("[data-plus]"))changeCart(t.dataset.plus,1);if(t.matches("[data-remove]")){delete cart[t.dataset.remove];renderCart()}});
+$("event-select").addEventListener("change",e=>selectEvent(e.target.value));$("refresh-events").onclick=loadEvents;$("save-plan").onclick=savePlan;$("open-sale").onclick=openSale;$("sync-event").onclick=syncEvent;$("close-sale").onclick=closeSale;$("checkout").onclick=openPayment;$("cancel-payment").onclick=()=>$("payment-modal").classList.add("hidden");$("confirm-payment").onclick=completePayment;$("cash-received").addEventListener("input",updateChange);document.querySelectorAll(".payment-tabs button").forEach(b=>b.onclick=()=>{paymentType=b.dataset.payment;document.querySelectorAll(".payment-tabs button").forEach(x=>x.classList.toggle("active",x===b));$("cash-field").classList.toggle("hidden",paymentType!=="cash");updateChange()});document.addEventListener("input",e=>{if(e.target.matches(".plan-input"))updatePlanTotal()});
+</script>
+<script src="auth-check.js"></script>
+</body>
+</html>
